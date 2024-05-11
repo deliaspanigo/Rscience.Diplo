@@ -208,7 +208,8 @@ server <- function(input, output) {
     includeMarkdown(system.file("vignettes", "report.Rmd", package = "Rscience.Diplo"))
     # Incluir el HTML en la interfaz de usuario
     output$rmd_output <- renderUI({
-      htmltools::includeHTML("report.html")
+      htmltools::includeHTML(system.file("vignettes", "report.html", package = "Rscience.Diplo"))
+      #htmltools::includeHTML("report.html")
      # tags$iframe(src="tmpuser/report.html", height = "100%", width = "100%")
     #  tags$iframe(src="tmpuser/report.html", height = 600, width = 600)
       #tags$iframe(htmltools::includeHTML("report.html"))

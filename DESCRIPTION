@@ -9,6 +9,7 @@ Encoding: UTF-8
 RoxygenNote: 7.3.1
 Imports:
   DT,
+  markdown,
   rmarkdown,
   shiny,
   shinydashboard
