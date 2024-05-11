@@ -1,11 +1,13 @@
 # Instalar y cargar los paquetes necesarios
-if (!require("shiny")) install.packages("shiny")
-if (!require("shinydashboard")) install.packages("shinydashboard")
-library(shiny)
-library(shinydashboard)
-library(DT)
+#if (!require("shiny")) install.packages("shiny")
+#if (!require("shinydashboard")) install.packages("shinydashboard")
+
 
 app_001_diplo <- function(){
+
+  library(shiny)
+  library(shinydashboard)
+  library(DT)
 
 # Definir la interfaz de usuario
 ui <- shinydashboard::dashboardPage(
