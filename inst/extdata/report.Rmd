@@ -7,7 +7,8 @@ output: html_document
 ```{r,  include =FALSE}
 knitr::opts_chunk$set(echo=TRUE)
 BASE <- database()
-selected_var <- input$selected_var
+selected_var_name <- input$selected_var
+selected_var_pos <- base::match(colnames(BASE), selected_var_name)
 ```
 
 
@@ -22,7 +23,7 @@ plot(BASE)
 ```{r, include =T}
 # Aislamos el peso de los alumnos en un nuevo objeto
 # llamado "VR".
-VR <- BASE[,2]
+VR <- BASE[,selected_var_pos]
 VR
 ```
 
