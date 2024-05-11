@@ -1,0 +1,18 @@
+---
+title: "Example"
+author: "David"
+output: html_document
+---
+
+```{r,  include =FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+```
+
+
+## Esto es TExto
+
+Lalala
+```{r, setup, include =T}
+plot(mtcars)
+```
+

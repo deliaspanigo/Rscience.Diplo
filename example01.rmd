@@ -1,0 +1,19 @@
+---
+title: "Example"
+author: "David"
+output: html_document
+---
+
+```{r,  include =FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+database <- database()
+```
+
+
+## Esto es TExto
+
+Lalala
+```{r, include =T}
+plot(database)
+```
+
