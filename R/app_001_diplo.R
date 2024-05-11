@@ -216,13 +216,13 @@ server <- function(input, output) {
     #rmarkdown::render("report.Rmd", output_file = "report.html")
     #aver <- system.file("vignettes", "report.Rmd")
     #rmarkdown::render("report.Rmd", output_file = "report.html")
-    htmltools::includeMarkdown(base::system.file("vignettes", "report.Rmd", package = "Rscience.Diplo"))
+    #htmltools::includeMarkdown(base::system.file("vignettes", "report.Rmd", package = "Rscience.Diplo"))
     # Incluir el HTML en la interfaz de usuario
     output$rmd_output <- shiny::renderUI({
 
-      rmarkdown::render(base::system.file("inst/extdata/", "report.Rmd", package = "Rscience.Diplo"), output_format = "html_document")
+      rmarkdown::render(base::system.file("extdata", "report.Rmd", package = "Rscience.Diplo"), output_format = "html_document")
 
-      html_file_path <- base::system.file("inst/extdata/", "report.html", package = "Rscience.Diplo")
+      html_file_path <- base::system.file("extdata", "report.html", package = "Rscience.Diplo")
 
       html_content <- base::readLines(html_file_path)
 
