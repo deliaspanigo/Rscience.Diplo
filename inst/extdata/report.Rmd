@@ -6,6 +6,8 @@ output: html_document
 
 ```{r,  include =FALSE}
 knitr::opts_chunk$set(echo=TRUE)
+database <- database()
+selected_var <- input$selected_var
 ```
 
 
@@ -13,6 +15,67 @@ knitr::opts_chunk$set(echo=TRUE)
 
 Lalala
 ```{r, setup, include =T}
-plot(mtcars)
+plot(database)
 ```
+
+
+```{r, setup, include =T}
+# Aislamos el peso de los alumnos en un nuevo objeto
+# llamado "VR".
+VR <- BASE[,2]
+VR
+```
+
+```{r, setup, include =T}
+# Media
+mean(VR)
+```
+
+```{r, setup, include =T}
+# Mediana 
+median(VR)
+```
+
+```{r, setup, include =T}
+# Minimo
+min(VR)
+```
+
+```{r, setup, include =T}
+# Maximo
+max(VR)
+```
+
+```{r, setup, include =T}
+# Cantidad de Datos
+length(VR)
+```
+
+```{r, setup, include =T}
+# Varianza
+var(VR)
+```
+
+```{r, setup, include =T}
+# Desvio Estandard
+sd(VR)
+```
+
+```{r, setup, include =T}
+# Summary
+summary(VR)
+```
+
+```{r, setup, include =T}
+# Objeto MEDIDAS
+MEDIDAS <- summary(VR)
+MEDIDAS
+```
+
+```{r, setup, include =T}
+# Solo algunas MEDIDAS
+MEDIDAS[c(2,3,5)]
+```
+
+
 
