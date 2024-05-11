@@ -8,7 +8,7 @@ output: html_document
 knitr::opts_chunk$set(echo=TRUE)
 BASE <- database()
 selected_var_name <- input$selected_var
-selected_var_pos <- base::match(colnames(BASE), selected_var_name)
+selected_var_pos <- base::match(selected_var_name, colnames(BASE))
 ```
 
 
