@@ -15,7 +15,9 @@ ui <- shinydashboard::dashboardPage(
 
   shinydashboard::dashboardSidebar(
     shinydashboard::sidebarMenu(
-      "Diplo - 0.0.1",br(),br(),
+      "Diplo - 0.0.1",
+      shiny::br(),
+      shiny::br(),
       shinydashboard::menuItem(text = "Clase 01", tabName = "tab_clase01", icon = shiny::icon("th")),
       shinydashboard::menuItem(text = "Clase 02", tabName = "tab_clase02", icon = shiny::icon("th")),
       shinydashboard::menuItem(text = "Clase 03", tabName = "tab_clase03", icon = shiny::icon("th")),
@@ -52,26 +54,31 @@ ui <- shinydashboard::dashboardPage(
               closable = FALSE,# Colapsado por defecto
               width = 12,
 
-              selectInput(inputId = "data_source",
+              shiny::selectInput(inputId = "data_source",
                           label = "Fuente de datos",
                           choices = c("R examples" = "r_examples",
                                       "CSV files"  = "csv_file",
                                       "Diplo UNC"  = "diplo_file")),
-              br(),br(),
+              shiny::br(),
+              shiny::br(),
 
-              conditionalPanel(condition = "input.data_source == 'r_examples'",
-                               selectInput(inputId = "r_database",
-                                           label = "Bases de R",
-                                           choices = c("01 - mtcars" = "mtcars",
-                                                       "02 - iris" =  "iris"))),
+              shiny::conditionalPanel(condition = "input.data_source == 'r_examples'",
+                shiny::selectInput(inputId = "r_database",
+                                     label = "Bases de R",
+                                   choices = c("01 - mtcars" = "mtcars",
+                                               "02 - iris" =  "iris"))),
 
 
-              br(), br(),
+              shiny::br(),
+              shiny::br(),
 
-          DT::DTOutput("table_database"), br(), br()
+          DT::DTOutput("table_database"),
+          shiny::br(),
+          shiny::br()
 
     ),
-    br(), br(),
+    shiny::br(),
+    shiny::br(),
     shiny::fluidRow(
       shiny::column(12,
                     shinydashboard::box(
@@ -83,9 +90,11 @@ ui <- shinydashboard::dashboardPage(
                       collapsed = FALSE,
                       closable = FALSE,# Colapsado por defecto
                       width = 12,
-                      uiOutput("var_selector"), br(), br(),
-                      actionButton("render", "Renderizar R Markdown"),
-                      uiOutput("rmd_output")#,
+                      shiny::uiOutput("var_selector"),
+                      shiny::br(),
+                      shiny::br(),
+                      shiny::actionButton("render", "Renderizar R Markdown"),
+                      shiny::uiOutput("rmd_output")#,
                      # shiny::plotOutput("distPlot")
 
                     )
@@ -105,17 +114,17 @@ ui <- shinydashboard::dashboardPage(
 server <- function(input, output) {
 
   # Inicializacion de objetos
-  database <- reactiveVal()
-  vector_var_names <- reactiveVal()
+  database <- shiny::reactiveVal()
+  vector_var_names <- shiny::reactiveVal()
 
   # Fuente de datos y creacion de database
-  observeEvent(input$"data_source", {
+  shiny::observeEvent(input$"data_source", {
 
       if(input$data_source == "r_examples"){
 
         # database
-        observeEvent(input$"r_database", {
-        database(eval(parse(text = input$"r_database")))
+        shiny::observeEvent(input$"r_database", {
+        database(base::eval(base::parse(text = input$"r_database")))
         })
 
 
@@ -125,15 +134,15 @@ server <- function(input, output) {
   })
 
 
-  observeEvent(database(),{
-    vector_var_names(colnames(database()))
+  shiny::observeEvent(database(),{
+    vector_var_names(base::colnames(database()))
   })
 
 
   # vector var names
 
 
-  output$table_database <- renderDT({
+  output$table_database <- DT::renderDT({
 
   req(database())
 
@@ -187,36 +196,38 @@ server <- function(input, output) {
 
 
 
-  observeEvent(database(),{
+  shiny::observeEvent(database(),{
 
-    output$var_selector <- renderUI({
+    output$var_selector <- shiny::renderUI({
 
       req(database(), vector_var_names())
       vector_opciones <- c("Selecciona una..." = "", vector_var_names())
 
-      selectInput(inputId = "selected_var", label = "Selecciona una variable",
+      shiny::selectInput(inputId = "selected_var", label = "Selecciona una variable",
                   choices = vector_opciones,
                   selected = vector_opciones[2])
 
     })
   })
-  observeEvent(input$render, {
+
+
+  shiny::observeEvent(input$render, {
     # Renderizar el archivo .Rmd a HTML
     #rmarkdown::render("report.Rmd", output_file = "report.html")
     #aver <- system.file("vignettes", "report.Rmd")
     #rmarkdown::render("report.Rmd", output_file = "report.html")
-    includeMarkdown(system.file("vignettes", "report.Rmd", package = "Rscience.Diplo"))
+    htmltools::includeMarkdown(base::system.file("vignettes", "report.Rmd", package = "Rscience.Diplo"))
     # Incluir el HTML en la interfaz de usuario
-    output$rmd_output <- renderUI({
+    output$rmd_output <- shiny::renderUI({
 
-      rmarkdown::render(system.file("vignettes", "report.Rmd", package = "Rscience.Diplo"), output_format = "html_document")
+      rmarkdown::render(base::system.file("inst/extdata/", "report.Rmd", package = "Rscience.Diplo"), output_format = "html_document")
 
-      html_file_path <- system.file("vignettes", "report.html", package = "Rscience.Diplo")
+      html_file_path <- base::system.file("inst/extdata/", "report.html", package = "Rscience.Diplo")
 
-      html_content <- readLines(html_file_path)
+      html_content <- base::readLines(html_file_path)
 
       # Include the HTML content in the Shiny app
-      HTML(paste(html_content, collapse = "\n"))
+      htmltools::HTML(base::paste(html_content, collapse = "\n"))
 
       #htmltools::includeHTML(html_file_path)
 
@@ -236,7 +247,7 @@ server <- function(input, output) {
 }
 
 # Ejecutar la aplicación
-shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
+shiny::shinyApp(ui = ui, server = server, options = base::list(launch.browser = TRUE))
 
 
 }
