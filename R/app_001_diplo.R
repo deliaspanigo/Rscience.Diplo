@@ -220,6 +220,7 @@ server <- function(input, output) {
     # Incluir el HTML en la interfaz de usuario
     output$rmd_output <- shiny::renderUI({
 
+
       rmarkdown::render(base::system.file("extdata", "report.Rmd", package = "Rscience.Diplo"), output_format = "html_document")
 
       html_file_path <- base::system.file("extdata", "report.html", package = "Rscience.Diplo")
