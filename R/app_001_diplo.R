@@ -208,7 +208,18 @@ server <- function(input, output) {
     includeMarkdown(system.file("vignettes", "report.Rmd", package = "Rscience.Diplo"))
     # Incluir el HTML en la interfaz de usuario
     output$rmd_output <- renderUI({
-      htmltools::includeHTML(system.file("vignettes", "report.html", package = "Rscience.Diplo"))
+
+      rmarkdown::render(system.file("vignettes", "report.Rmd", package = "Rscience.Diplo"), output_format = "html_document")
+
+      html_file_path <- system.file("vignettes", "report.html", package = "Rscience.Diplo")
+
+      html_content <- readLines(html_file_path)
+
+      # Include the HTML content in the Shiny app
+      HTML(paste(html_content, collapse = "\n"))
+
+      #htmltools::includeHTML(html_file_path)
+
       #htmltools::includeHTML("report.html")
      # tags$iframe(src="tmpuser/report.html", height = "100%", width = "100%")
     #  tags$iframe(src="tmpuser/report.html", height = 600, width = 600)
