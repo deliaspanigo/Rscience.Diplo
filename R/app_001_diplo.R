@@ -41,6 +41,7 @@ ui <- shinydashboard::dashboardPage(
   shinydashboard::dashboardBody(
     shinydashboard::tabItems(
 
+
       shinydashboard::tabItem(tabName = "tab_clase01",
                               module_diplo_001_clase01_ui("space_clase01")) # Final - tab_clase01
 )

@@ -5,6 +5,8 @@
 module_diplo_001_clase01_ui <- function(id){
   ns <- shiny::NS(id)
 
+
+
   div(shinyjs::useShinyjs(), id = ns("input-panel"),
 
       shiny::h1("Clase 01"),
@@ -97,9 +99,14 @@ module_diplo_001_clase01_ui <- function(id){
 
 
 module_diplo_001_clase01_server <- function(id){
+
+
+
   moduleServer(
     id,
     function(input, output, session) {
+
+      ENV_SET_PACK <- TRUE
 
       # Inicializacion de objetos
       database <- shiny::reactiveVal()
@@ -188,14 +195,25 @@ module_diplo_001_clase01_server <- function(id){
 
         output$var_selector <- shiny::renderUI({
 
-          req(database(), vector_var_names())
-          vector_opciones <- c("Selecciona una..." = "", vector_var_names())
+          ns <- shiny::NS(id)
 
-          shiny::selectInput(inputId = ns("selected_var"), label = "Selecciona una variable",
+          req(database(), vector_var_names())
+
+          vector_opciones <- 1:ncol(database())
+          names(vector_opciones) <- colnames(database())
+          vector_opciones <- c("Selecciona una..." = "", vector_opciones)
+
+          shiny::selectInput(inputId = ns("selected_pos_var"), label = "Selecciona una variable",
                              choices = vector_opciones,
                              selected = vector_opciones[2])
 
         })
+      })
+
+
+      selected_var_pos <- reactive({
+        req(input$selected_pos_var)
+        as.numeric(as.character(input$selected_pos_var))
       })
 
 
@@ -208,15 +226,36 @@ module_diplo_001_clase01_server <- function(id){
         # Incluir el HTML en la interfaz de usuario
         output$rmd_output <- shiny::renderUI({
 
+          print(ENV_SET_PACK)
 
-          rmarkdown::render(base::system.file("extdata", "report.Rmd", package = "Rscience.Diplo"), output_format = "html_document")
+          if(ENV_SET_PACK){
+            rmd_file_path_master <- base::system.file("extdata", "report_clase01_master.Rmd", package = "Rscience.Diplo")
+            rmd_file_path_mod    <- base::system.file("extdata", "report_clase01_mod.Rmd",    package = "Rscience.Diplo")
+            html_file_mod        <- base::system.file("extdata", "report_clase01_mod.html",   package = "Rscience.Diplo")
+          } else
 
-          html_file_path <- base::system.file("extdata", "report.html", package = "Rscience.Diplo")
+          if(!ENV_SET_PACK){
+            rmd_file_path_master <- file.path(getwd(), "inst", "extdata", "report_clase01_master.Rmd")
+            rmd_file_path_mod    <- file.path(getwd(), "inst", "extdata", "report_clase01_mod.Rmd")
+            html_file_path_mod   <- file.path(getwd(), "inst", "extdata", "report_clase01_mod.html")
+          }
 
-          html_content <- base::readLines(html_file_path)
 
-          # Include the HTML content in the Shiny app
-          htmltools::HTML(base::paste(html_content, collapse = "\n"))
+          # Leer el archivo y modificar
+          lines_rmd_mod <- readLines(con = rmd_file_path_master)
+          lines_rmd_mod <- gsub(pattern = "_database_", replacement = "database()", x = lines_rmd_mod)
+          lines_rmd_mod <- gsub(pattern = "_seleceted_pos_var_", replacement = selected_var_pos(), x = lines_rmd_mod)
+
+          # Guardar los cambios
+          writeLines(text = lines_rmd_mod, con = rmd_file_path_mod)
+
+          # Render .Rmd
+          rmarkdown::render(rmd_file_path_mod, output_format = "html_document")
+
+          # HTML
+          html_content_mod <- base::readLines(html_file_path_mod)
+          htmltools::HTML(base::paste(html_content_mod, collapse = "\n"))
+
 
           #htmltools::includeHTML(html_file_path)
 
