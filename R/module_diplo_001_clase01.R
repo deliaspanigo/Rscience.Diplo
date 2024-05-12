@@ -231,7 +231,7 @@ module_diplo_001_clase01_server <- function(id){
           if(ENV_SET_PACK){
             rmd_file_path_master <- base::system.file("extdata", "report_clase01_master.Rmd", package = "Rscience.Diplo")
             rmd_file_path_mod    <- base::system.file("extdata", "report_clase01_mod.Rmd",    package = "Rscience.Diplo")
-            html_file_mod        <- base::system.file("extdata", "report_clase01_mod.html",   package = "Rscience.Diplo")
+            html_file_path_mod        <- base::system.file("extdata", "report_clase01_mod.html",   package = "Rscience.Diplo")
           } else
 
           if(!ENV_SET_PACK){
