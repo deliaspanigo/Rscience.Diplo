@@ -1,0 +1,107 @@
+---
+title: "Example"
+author: "David"
+output: pdf_document
+---
+
+```{r,  include =FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+BASE <- mtcars
+#selected_var_pos <- _selected_pos_var_ 
+#selected_var_name <- colnames(BASE)[selected_var_pos]
+selected_var_pos <- 1
+```
+
+
+## Esto es TExto
+```{r, include =T}
+Sys.time()
+```
+
+Lalala
+```{r, include =T}
+plot(BASE)
+```
+
+
+```{r, include =T}
+# Aislamos una variable en particular de la base de datos.
+VR <- BASE[,selected_var_pos]
+VR
+```
+<br>
+<br>
+
+```{r, include =T}
+# Media
+mean(VR)
+```
+<br>
+<br>
+
+```{r, include =T}
+# Mediana 
+median(VR)
+```
+<br>
+<br>
+
+```{r, include =T}
+# Minimo
+min(VR)
+```
+<br>
+<br>
+
+```{r, include =T}
+# Maximo
+max(VR)
+```
+<br>
+<br>
+
+```{r, include =T}
+# Cantidad de Datos
+length(VR)
+```
+<br>
+<br>
+
+```{r, include =T}
+# Varianza
+var(VR)
+```
+<br>
+<br>
+
+```{r, include =T}
+# Desvio Estandard
+sd(VR)
+```
+<br>
+<br>
+
+```{r, include =T}
+# Summary
+summary(VR)
+```
+<br>
+<br>
+
+```{r, include =T}
+# Objeto MEDIDAS
+MEDIDAS <- summary(VR)
+MEDIDAS
+```
+<br>
+<br>
+
+```{r, include =T}
+# Solo algunas MEDIDAS
+MEDIDAS[c(2,3,5)]
+```
+<br>
+<br>
+
+
+

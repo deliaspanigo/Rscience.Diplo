@@ -8,8 +8,11 @@ app_001_diplo <- function(){
   library(shiny)
   library(shinydashboard)
   library(DT)
+  library(openxlsx)
+  library(shinyjs)
+  library(rmarkdown)
 
-# Definir la interfaz de usuario
+  # Definir la interfaz de usuario
 ui <- shinydashboard::dashboardPage(
   shinydashboard::dashboardHeader(title = "Mi primer dashboard"),
 
@@ -18,6 +21,7 @@ ui <- shinydashboard::dashboardPage(
       "Diplo - 0.0.1",
       shiny::br(),
       shiny::br(),
+      shinydashboard::menuItem(text = "Clase 99", tabName = "tab_clase99", icon = shiny::icon("th")),
       shinydashboard::menuItem(text = "Clase 01", tabName = "tab_clase01", icon = shiny::icon("th")),
       shinydashboard::menuItem(text = "Clase 02", tabName = "tab_clase02", icon = shiny::icon("th")),
       shinydashboard::menuItem(text = "Clase 03", tabName = "tab_clase03", icon = shiny::icon("th")),
@@ -42,11 +46,15 @@ ui <- shinydashboard::dashboardPage(
     shinydashboard::tabItems(
 
 
+      shinydashboard::tabItem(tabName = "tab_clase99",
+                              module_diplo_001_clase99_ui("space_clase99")), # Final - tab_clase99
+
+
       shinydashboard::tabItem(tabName = "tab_clase01",
                               module_diplo_001_clase01_ui("space_clase01")) # Final - tab_clase01
-)
-)
-)
+    )
+    )
+    )
 
 
 # addResourcePath("tmpuser", getwd())
@@ -55,8 +63,9 @@ ui <- shinydashboard::dashboardPage(
 server <- function(input, output) {
 
 
-  module_diplo_001_clase01_server("space_clase01")
+  module_diplo_001_clase99_server("space_clase99")
 
+  module_diplo_001_clase01_server("space_clase01")
 } #--- Fin server
 
 # Ejecutar la aplicación

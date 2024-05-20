@@ -1,19 +1,22 @@
 ---
 title: "Example"
 author: "David"
-output: html_document
+#output: html_document
 ---
 
 ```{r,  include =FALSE}
 knitr::opts_chunk$set(echo=TRUE)
-BASE <- _database_
-selected_var_pos <- _seleceted_pos_var_ 
-selected_var_name <- colnames(BASE)[selected_var_pos]
-
+BASE <- mtcars
+#selected_var_pos <- _selected_pos_var_ 
+#selected_var_name <- colnames(BASE)[selected_var_pos]
+seleceted_pos_var <- 1
 ```
 
 
 ## Esto es TExto
+```{r, include =T}
+Sys.time()
+```
 
 Lalala
 ```{r, include =T}
@@ -23,7 +26,7 @@ plot(BASE)
 
 ```{r, include =T}
 # Aislamos una variable en particular de la base de datos.
-VR <- BASE[,_seleceted_pos_var_]
+VR <- BASE[,selected_var_pos]
 VR
 ```
 <br>
