@@ -1,30 +1,31 @@
 ---
 title: "Example"
 author: "David"
-#output: html_document
+output: pdf_document
+
 ---
 
 ```{r,  include =FALSE}
 knitr::opts_chunk$set(echo=TRUE)
-BASE <- mtcars
+#BASE <- mtcars
 #selected_var_pos <- _selected_pos_var_ 
 #selected_var_name <- colnames(BASE)[selected_var_pos]
-seleceted_pos_var <- 1
+#selected_var_pos <- 1
 ```
 
 
 ## Esto es TExto
-```{r, include =T}
+```{r, include =T, class.source="bg-success"}
 Sys.time()
 ```
 
 Lalala
-```{r, include =T}
+```{r, include =T, class.source="bg-success"}
 plot(BASE)
 ```
 
 
-```{r, include =T}
+```{r, include =T, class.source="bg-success"}
 # Aislamos una variable en particular de la base de datos.
 VR <- BASE[,selected_var_pos]
 VR
@@ -32,28 +33,28 @@ VR
 <br>
 <br>
 
-```{r, include =T}
+```{r, include =T, class.source="bg-success"}
 # Media
 mean(VR)
 ```
 <br>
 <br>
 
-```{r, include =T}
+```{r, include =T, class.source="bg-success"}
 # Mediana 
 median(VR)
 ```
 <br>
 <br>
 
-```{r, include =T}
+```{r, include =T, class.source="bg-success"}
 # Minimo
 min(VR)
 ```
 <br>
 <br>
 
-```{r, include =T}
+```{r, include =T, class.source="bg-success"}
 # Maximo
 max(VR)
 ```
@@ -67,28 +68,28 @@ length(VR)
 <br>
 <br>
 
-```{r, include =T}
+```{r, include =T, class.source="bg-success"}
 # Varianza
 var(VR)
 ```
 <br>
 <br>
 
-```{r, include =T}
+```{r, include =T, class.source="bg-success"}
 # Desvio Estandard
 sd(VR)
 ```
 <br>
 <br>
 
-```{r, include =T}
+```{r, include =T, class.source="bg-success"}
 # Summary
 summary(VR)
 ```
 <br>
 <br>
 
-```{r, include =T}
+```{r, include =T, class.source="bg-success"}
 # Objeto MEDIDAS
 MEDIDAS <- summary(VR)
 MEDIDAS
@@ -96,7 +97,7 @@ MEDIDAS
 <br>
 <br>
 
-```{r, include =T}
+```{r, include =T, class.source="bg-success"}
 # Solo algunas MEDIDAS
 MEDIDAS[c(2,3,5)]
 ```

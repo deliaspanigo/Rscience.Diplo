@@ -15,7 +15,7 @@ devtools::install()
 
 ###############################################
 
-# Desinstalar Rscience
+# Desinstalar Rscience|
 remove.packages("Rscience")
 
 # Instalar el paquete para instalar

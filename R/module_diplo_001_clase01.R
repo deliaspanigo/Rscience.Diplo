@@ -6,6 +6,21 @@ module_diplo_001_clase01_ui <- function(id){
   ns <- shiny::NS(id)
 
   div(
+    tags$head(
+      tags$style(HTML("
+      .shiny-output-error-AVISO {
+        color: #0000ff;
+        font-weight: bold;
+      }
+    ")),
+      tags$style(HTML("
+      .shiny-output-error-ERROR {
+        color: #ff0000;
+        font-weight: bold;
+      }
+    "))
+    ),
+
     shinyjs::useShinyjs(),
     id = ns("input-panel"),
     shiny::h1("Clase 01"),
@@ -105,6 +120,7 @@ module_diplo_001_clase01_ui <- function(id){
                                       closable = FALSE,
                                       width = 12,
                                       shiny::uiOutput(ns("var_selector"))
+
                                     )),
                       shiny::column(8,
                                                shinydashboard::box(
@@ -129,7 +145,7 @@ module_diplo_001_clase01_ui <- function(id){
                                       ),
 
 
-
+                    shiny::textOutput(ns("control_general")),
                     br(), br(), br(),
                     uiOutput(ns("magia"))
       )
@@ -282,6 +298,8 @@ module_diplo_001_clase01_server <- function(id){
 
         output$var_selector <- shiny::renderUI({
 
+
+
           ns <- shiny::NS(id)
 
           req(database(), vector_var_names())
@@ -304,14 +322,31 @@ module_diplo_001_clase01_server <- function(id){
           names(vector_options) <- vector_names
           vector_options <- c("Selecciona una..." = "", vector_options)
 
+          div(
           shiny::selectInput(inputId = ns("selected_var_name"), label = "Selecciona una variable",
                              choices = vector_options,
-                             selected = vector_options[2])
+                             selected = vector_options[1]),
+          textOutput(ns("detalle_texto"))
+          )
 
         })
 
+        output$detalle_texto <- renderText({
+          #req(input$selected_var_name)
 
+          the_election <- input$selected_var_name
+          text01 <- "Selecciona una variable cuantitativa."
+          text02 <- ""
+          dt_ok <- the_election == ""
+          selected_text <- ifelse(dt_ok, text01, text02)
+          selected_text
+          #dt_ok
+        })
 
+        output$control_general <- renderText({
+          control_general()
+          ""
+        })
 
 
 
@@ -319,13 +354,14 @@ module_diplo_001_clase01_server <- function(id){
 
 
       selected_var_name <- reactive({
-        req(database(), input$selected_var_name)
+        req(database()) #, input$selected_var_name)
+        req(database())
         input$selected_var_name
 
       })
 
       selected_var_pos <- reactive({
-        req(database(), input$selected_var_name, selected_var_name())
+        req(database()) #, input$selected_var_name, selected_var_name())
 
         vector_var_names <- colnames(database())
         dt_pos <- vector_var_names == selected_var_name()
@@ -348,99 +384,178 @@ module_diplo_001_clase01_server <- function(id){
         validate(
           need(!is.null(database()), 'Error 001: Problemas en la base de datos. Vuelva a cargar el archivo'),
           need(!is.null(selected_var_name()), 'Error 002: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
-          need(!is.null(selected_var_pos()), 'Error 002: Problemas con la variable seleccionada. Vuelva a cargar el archivo.')
-
+          need(!is.null(selected_var_pos()), 'Error 002: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+          errorClass = "ERROR"
         )
 
         validate(
           need((ncol(database())>= 1), 'Error 003: La base de datos debe contener al menos una columna.'),
-          need((nrow(database())>= 2), 'Error 004: La base de datos debe contener al menos una fila.')
+          need((nrow(database())>= 2), 'Error 004: La base de datos debe contener al menos una fila.'),
+          errorClass = "ERROR"
+        )
+
+        print(paste0("La eleccion: ", selected_var_name()))
+        print(sum(colnames(database()) == selected_var_name()) == 1)
+        print("\n")
+        print("\n")
+
+        validate(
+          need(selected_var_name() != "", 'Seleccione una variable cuantitativa de su base de datos.'),
+          errorClass = "AVISO"
         )
 
         validate(
-          need(sum(colnames(database()) == selected_var_name()) == 1, 'Error 005: El nombre de variable seleccionado no pertenece a la base.')
+          need(sum(colnames(database()) == selected_var_name()) == 1, 'Error 005: El nombre de variable seleccionado no pertenece a la base.'),
+          errorClass = "ERROR"
         )
 
         validate(
-          need(ncol(database()) > selected_var_pos(), 'Error 005: La posición de variable no pertenece a la base de datos.')
+          need(ncol(database()) >= selected_var_pos(), 'Error 006: La posición de variable no pertenece a la base de datos.'),
+          errorClass = "ERROR"
         )
 
 
         vector_vr <- database()[,selected_var_pos()]
 
         validate(
-         need((sum(is.na(vector_vr))==0), 'Error 005: La columna seleccionada posee al menos una celda sin datos. \n
-              En la diplomatura solo veremos código aplicable a bases de datos sin celdas vacías.')
+         need((sum(is.na(vector_vr))==0), 'Error 007: La columna seleccionada posee al menos una celda sin datos. \n
+              Usted está trabajando con una base de datos que no corresponde a la Diplomatura.
+              En la diplomatura solo veremos código de R aplicable a bases de datos sin celdas vacías.'),
+         errorClass = "ERROR"
         )
 
         validate(
-          need((is.numeric(vector_vr)), 'Error 006: La variable seleccionada debe ser numérica. Verifique las siguientes opciones:\n
-               1) Se equivocó al seleccionar variable.\n
-               2) No abrió la base de datos csv como archivo de texto para tomar noción sobre \n
-               si el archivo tiene como primera fila al nombre de columnas, cual es el separador de columna \n
+          need((is.numeric(vector_vr)), 'Error 008: La variable seleccionada debe ser numérica. Verifique las siguientes opciones:\n
+               1) Se equivocó al seleccionar variable con la cual trabajar. La variable seleccionada debe ser cuantitativa.\n
+               2) No abrió la base de datos csv como archivo de texto en su computadora para tomar noción sobre
+               si el archivo tiene como primera fila al nombre de columnas, cual es el separador de columna
                y del separador decimal.\n
-               3) Mal indicado el argumento header en el menú de carga del archivo csv.\n
-               4) Mal indicado el separador de columna en el menú de carga del archivo csv.\n
-               5) Mal indicado el separador decimal en el menú de carga del archivo csv.\n'
-               )
+               3) Regrese al menú de carga, y verifique que todos las opciones seleccionadas correspondan con lo que usted observa en su archivo CSV en su computadora.
+               4) Si usted está trabajando con una base de datos que no corresponde a la Semana 01 de la Diplomatura, verifique que todas las celdas de la columna elegida solo contienen números.
+               Posiblemente alguna celda de la columna seleccionada posee algún caracter no numérico en alguna celda.\n'
+               ),
+          errorClass = "ERROR"
           )
 
 
         return(TRUE)
 
       })
+
+
+
 ################################################################################
 
       the_time <- reactiveVal()
       report_loc <- reactiveVal()
-      my_output_temp_folder <- reactiveVal()
-      report_output_path_pdf <- reactiveVal()
+      my_output_temp_folder   <- reactiveVal()
+      report_output_path_pdf  <- reactiveVal()
       report_output_path_html <- reactiveVal()
       report_output_path_word <- reactiveVal()
-      report_output_path_zip <- reactiveVal()
+      report_output_path_zip  <- reactiveVal()
 
 
       observeEvent(input$render_report_button, {
+        # Execution time...
         execution_time <- format(Sys.time(), "%Y_%m_%d_%H_%M_%S")
-        input_file_rmd <- 'report_clase01_master.Rmd'
-        input_path_rmd <- normalizePath(input_file_rmd)
 
+        # File .Rmd
+        rmd_file_master <- "report_diplo_clase01_master.Rmd"
+        special_folder <- file.path("inst", "extdata", "rmd_diplo")
+
+        # Paths for rmd input
+        input_path_package   <- base::system.file(package = "Rscience.Diplo")
+        input_folder_package <- file.path(input_path_package, special_folder)
+        input_folder_local   <- file.path(getwd(), special_folder)
+
+        # Input folder
+        input_folder_master <- ifelse(input_folder_package != "", input_folder_package, input_folder_local)
+
+        # Input files
+        input_file_rmd   <- 'report_diplo_clase01_master.Rmd'
+        input_file_png01 <- "fcefyn.png"
+        input_file_css <- "fcefyn.png"
+
+        # Input paths
+        input_path_rmd   <- file.path(input_folder_master, input_file_rmd)
+        input_path_png01 <- file.path(input_folder_master, input_file_png01)
+        input_path_css   <- file.path(input_folder_master, input_file_css)
+
+#        input_path_rmd <- normalizePath(input_file_rmd)
+
+        # File names
         p1_name <- tools::file_path_sans_ext(input_file_rmd)
         p2_name <- tools::file_ext(input_file_rmd)
 
-        output_file_rmd  <- paste0(p1_name, "_", execution_time, ".", p2_name)
-        output_file_pdf  <- paste0(tools::file_path_sans_ext(output_file_rmd), ".pdf")
-        output_file_html <- paste0(tools::file_path_sans_ext(output_file_rmd), ".html")
-        output_file_word <- paste0(tools::file_path_sans_ext(output_file_rmd), ".docx")
-        output_file_zip  <- paste0(tools::file_path_sans_ext(output_file_rmd), ".zip")
+        output_file_rmd   <- paste0(p1_name, "_", execution_time, ".", p2_name)
+        output_file_rmd   <- gsub(pattern = "_master",replacement = "_mod", x = output_file_rmd)
+        output_file_pdf   <- paste0(tools::file_path_sans_ext(output_file_rmd), ".pdf")
+        output_file_html  <- paste0(tools::file_path_sans_ext(output_file_rmd), ".html")
+        output_file_word  <- paste0(tools::file_path_sans_ext(output_file_rmd), ".docx")
+        output_file_zip   <- paste0(tools::file_path_sans_ext(output_file_rmd), ".zip")
 
-        #new_temp_folder <- tempdir()
-        new_temp_folder <- normalizePath("super_folder")
+        # Output folder and output paths
+        new_temp_folder <- tempdir()
+        #new_temp_folder <- normalizePath("super_folder")
         output_path_rmd  <- file.path(new_temp_folder, output_file_rmd)
         output_path_pdf  <- file.path(new_temp_folder, output_file_pdf)
         output_path_html <- file.path(new_temp_folder, output_file_html)
         output_path_word <- file.path(new_temp_folder, output_file_word)
         output_path_zip  <- file.path(new_temp_folder, output_file_zip)
+        output_path_png01  <- file.path(new_temp_folder, input_file_png01)
+        output_path_css <- file.path(new_temp_folder, input_file_css)
 
-        file.copy(input_path_rmd, output_path_rmd, overwrite = TRUE)
+        # Copy from original .Rmd
+        #file.copy(input_path_rmd, output_path_rmd, overwrite = TRUE)
+        file.copy(from = input_path_png01, to = output_path_png01, overwrite = TRUE)
+        file.copy(from = input_path_css,   to = output_path_css, overwrite = TRUE)
 
-        # Nuevo enviroment
+        # Objetos de entorno
         render_env <- new.env()
         render_env$"BASE" <- database()
-        render_env$"selected_var_pos" <- selected_var_pos()
 
+        # Objetos de reemplazo
+        #print(names())
+
+        replacement_list <- list()
+        replacement_list$"selected_var_pos" <- selected_var_pos()
+        replacement_list$".user_file" <- paste0("\"", input$csv_file_path$name, "\"")
+        replacement_list$".user_header" <- as.logical(as.character(input$header))
+        replacement_list$".user_sep" <- paste0("\"", input$sep, "\"")
+        replacement_list$".user_dec" <- paste0("\"", input$dec, "\"")
+        replacement_list$".user_sAF" <- FALSE
+
+        # Aplicacion de modificaciones
+        lineas_modificadas <- readLines(input_path_rmd)
+
+        for (k in 1:length(replacement_list)){
+          selected_name <- names(replacement_list)[k]
+          lineas_modificadas <- gsub(pattern = selected_name,
+                                     replacement = replacement_list[[selected_name]],
+                                     x = lineas_modificadas)
+        }
+
+
+        writeLines(lineas_modificadas, output_path_rmd)
+
+        # Enviroment for Rmarkdown
+
+
+
+        # Render All
         rmarkdown::render(output_path_rmd, pdf_document(),  output_file = output_path_pdf, envir = render_env)
         rmarkdown::render(output_path_rmd, html_document(), output_file = output_path_html, envir = render_env)
         rmarkdown::render(output_path_rmd, word_document(), output_file = output_path_word, envir = render_env)
 
+        # Add info to ReactiveVals()...
         the_time(execution_time)
         my_output_temp_folder(new_temp_folder)
         report_output_path_pdf(output_path_pdf)
         report_output_path_html(output_path_html)
         report_output_path_word(output_path_word)
         report_output_path_zip(output_path_zip)
-
         report_loc(list.files(new_temp_folder, full.names = TRUE))
+
       })
 
       control_user_pdf <- reactive({
@@ -507,13 +622,14 @@ module_diplo_001_clase01_server <- function(id){
         my_file <- basename(report_output_path_html())
         my_local_file <- file.path("my_output_temp_folder", my_file)
 
-        armado_v <- paste('<div style="height: 1000vh; width: 200vh; overflow: hidden;"><iframe style="height: 1000vh; width:200vh; border: none;" src="', my_local_file, '"></iframe></div>', sep = "")
+        armado_v <- paste('<div style="height: 1000vh; width: 100%; overflow: hidden;"><iframe style="height: 1000vh; width:100%; border: none;" src="', my_local_file, '"></iframe></div>', sep = "")
         print(armado_v)
         return(armado_v)
       })
 
       output$magia <- renderUI({
 
+        req(control_general())
         ns <- NS(id)
 
         shinydashboard::box(
