@@ -26,128 +26,22 @@ module_diplo_001_clase01_ui <- function(id){
     shiny::h1("Clase 01"),
     shiny::fluidRow(
       shiny::column(12,
-                    shinydashboard::box(
-                      title = "01 - Seleccionar base de datos",
-                      status = "primary",
-                      id = ns("my_box01"),
-                      solidHeader = TRUE,
-                      collapsible = TRUE,
-                      collapsed = TRUE,
-                      closable = FALSE,
-                      width = 12,
-                      fluidRow(
-                        column(3,
-                               shiny::selectInput(
-                                 inputId = ns("data_source"),
-                                 label = "Fuente de datos",
-                                 choices = c("R examples" = "r_source", "CSV files" = "csv_source", "Diplo UNC" = "diplo_source")
-                               )
-                        )
-                      ),
-                      shiny::br(),
-                      shiny::br(),
-                      shiny::conditionalPanel(
-                        condition = "input.data_source == 'r_source'",
-                        ns = ns,
-                        fluidRow(
-                          column(3,
-                                 shiny::selectInput(
-                                   inputId = ns("r_database"),
-                                   label = "Bases de R",
-                                   choices = c("01 - mtcars" = "mtcars", "02 - iris" = "iris")
-                                 )
-                          )
-                        )
-                      ),
-                      shiny::conditionalPanel(
-                        condition = "input.data_source == 'csv_source'",
-                        ns = ns,
-                        fluidRow(
-                          column(4,
-                                 fileInput(
-                                   inputId = ns("csv_file_path"),
-                                   label = "Elija un archivo CSV",
-                                   accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
-                                 )
-                          )
-                        ),
-                        fluidRow(
-                          column(1, radioButtons(
-                            inputId = ns("header"),
-                            label = "header",
-                            choices = c("TRUE" = TRUE, "FALSE" = FALSE),
-                            selected = TRUE
-                          )),
-                          column(2, radioButtons(
-                            inputId = ns("sep"),
-                            label = "Separador de columnas",
-                            choices = c("semicolon (;)" = ";", "comma (,)" = ","),
-                            selected = ";"
-                          )),
-                          column(2, radioButtons(
-                            inputId = ns("dec"),
-                            label = "Decimal",
-                            choices = c("Period (.)" = ".", "Comma (,)" = ","),
-                            selected = "."
-                          )),
-                          column(2, radioButtons(
-                            inputId = ns("quote"),
-                            label = "Comillas",
-                            choices = c("Double quotes (\")" = "\"", "Simple quotes (')" = "'"),
-                            selected = "\""
-                          ))
-                        ),
-                        tags$hr()
-                      ),
-                      shiny::br(),
-                      shiny::br(),
-                      DT::dataTableOutput(ns("table_database2")),
-                      DT::DTOutput(ns("table_database")),
-                      shiny::br(),
-                      shiny::br()
-                    ),
-                    shiny::br(),
-                    shiny::br(),
-                    shiny::fluidRow(
-                      shiny::column(4,
-                                    shinydashboard::box(
-                                      title = "02 - Estadísticas y Código de R",
-                                      status = "primary",
-                                      id = ns("my_box02"),
-                                      solidHeader = TRUE,
-                                      collapsible = TRUE,
-                                      collapsed = FALSE,
-                                      closable = FALSE,
-                                      width = 12,
-                                      shiny::uiOutput(ns("var_selector"))
 
-                                    )),
-                      shiny::column(8,
-                                               shinydashboard::box(
-                                                 title = "03 - Control de Misión",
-                                                 status = "primary",
-                                                 id = ns("my_box03"),
-                                                 solidHeader = TRUE,
-                                                 collapsible = TRUE,
-                                                 collapsed = FALSE,
-                                                 closable = FALSE,
-                                                 width = 12,
-                                                 div(
-                                                   h2("Generacion de Reportes"), br(),
-                                                   actionButton(ns("render_report_button"), "Render Report", width = "100%"),
-                                                   downloadButton(outputId = ns('download_button_pdf'), label = "Download PDF", width = "100%", disabled = TRUE),
-                                                   downloadButton(outputId = ns('download_button_html'), label = "Download HTML", width = "100%", disabled = TRUE),
-                                                   downloadButton(outputId = ns('download_button_word'), label = "Download WORD", width = "100%", disabled = TRUE),
-                                                   downloadButton(outputId = ns('download_button_zip'), label = "Download All (ZIP)", width = "100%", disabled = TRUE)
-                                                 )
-                                               )
-                                        )
-                                      ),
+        uiOutput(ns("box01_database")),
+        shiny::br(),
+        shiny::br(),
+
+        shiny::fluidRow(
+          shiny::column(4, uiOutput(ns("box02_var_selector"))),
+          shiny::column(8, uiOutput(ns("box03_control_de_mision")))
+          ),
 
 
-                    shiny::textOutput(ns("control_general")),
-                    br(), br(), br(),
-                    uiOutput(ns("magia"))
+        shiny::textOutput(ns("text_control_general")),
+        br(), br(), br(),
+
+        uiOutput(ns("box04_report")),
+        br(), br(), br()
       )
     )
   ) # End div
@@ -173,13 +67,44 @@ module_diplo_001_clase01_server <- function(id){
       # ns para el server!
       ns <- session$ns
 
-      # Inicializacion de objetos
+
+###---###---###---###---###---###---###---###---###---###---###---###---###---###
+
+      #--- control_01 - Control del inputfile
+      control_01 <- reactive({
+
+        # # # Control sobre input$data_source
+        req(input$"data_source")
+
+        validate(
+          need(!is.null(input$"data_source"), 'Error 001: Problemas en input$data_source.'),
+          errorClass = "ERROR"
+        )
+
+        # Si el archivo es CSV...
+        if(input$"data_source" == "csv_source"){
+
+          req(input$csv_file_path$name)
+
+          csv_file_name <- input$csv_file_path$name
+          final_ext <- tools::file_ext(csv_file_name)
+
+          validate(
+            need(final_ext == "csv", 'Error 002: Solo es posible cargar archivos CSV.\n    Prueba con otro archivo!'),
+            errorClass = "ERROR"
+          )
+        }
+
+
+
+
+
+        return(TRUE)
+      })
+
+
+      #--- Fuente de datos y creacion de database
       database <- shiny::reactiveVal()
-      vector_var_names  <- shiny::reactiveVal()
-
-
-
-      # Fuente de datos y creacion de database
       shiny::observeEvent(input$"data_source", {
 
         database(NULL)
@@ -202,7 +127,7 @@ module_diplo_001_clase01_server <- function(id){
 
             # database
             shiny::observeEvent(input$"csv_file_path", {
-              req(input$csv_file_path)
+              req(input$csv_file_path, control_01())
 
               database(NULL)
 
@@ -225,10 +150,36 @@ module_diplo_001_clase01_server <- function(id){
 
       })
 
+###---###---###---###---###---###---###---###---###---###---###---###---###---###
+
+      #--- control_02 - Control del database()
+      control_02 <- reactive({
+
+        # # # Control sobre database()
+        req(control_01(), database())
+
+        validate(
+          need(!is.null(database()), 'Error 003: Problemas en la base de datos. Vuelva a cargar el archivo'),
+          errorClass = "ERROR"
+        )
+
+        validate(
+          need((ncol(database())>= 1), 'Error 004: La base de datos debe contener al menos una columna.'),
+          need((nrow(database())>= 1), 'Error 005: La base de datos debe contener al menos una fila.'),
+          errorClass = "ERROR"
+        )
+
+
+
+        return(TRUE)
+
+      })
+
+
 
       output$table_database <- DT::renderDT({
 
-        req(database())
+        req(control_02())
 
 
 
@@ -277,10 +228,10 @@ module_diplo_001_clase01_server <- function(id){
         )
       })
 
-
+      # Muteada!
       output$table_database2 <- renderDataTable({
 
-        req(database())
+        req(control_02())
 
         database()
 
@@ -289,13 +240,16 @@ module_diplo_001_clase01_server <- function(id){
 
 
       # vector var names - selector
-      shiny::observeEvent(database(),{
-        req(database())
 
+      vector_var_names  <- shiny::reactiveVal()
+      shiny::observeEvent(database(),{
+        # Control hasta inputFile + database()
+        req(control_02())
+
+        # Nombre de las columnas
         vector_var_names(base::colnames(database()))
 
-
-
+        # Seleccion de una variable cuantitati a
         output$var_selector <- shiny::renderUI({
 
 
@@ -323,119 +277,84 @@ module_diplo_001_clase01_server <- function(id){
           vector_options <- c("Selecciona una..." = "", vector_options)
 
           div(
-          shiny::selectInput(inputId = ns("selected_var_name"), label = "Selecciona una variable",
+          shiny::selectInput(inputId = ns("selected_var_name"), label = "Selecciona una variable cuantitativa...",
                              choices = vector_options,
-                             selected = vector_options[1]),
-          textOutput(ns("detalle_texto"))
+                             selected = vector_options[1])
           )
 
         })
 
-        output$detalle_texto <- renderText({
-          #req(input$selected_var_name)
-
-          the_election <- input$selected_var_name
-          text01 <- "Selecciona una variable cuantitativa."
-          text02 <- ""
-          dt_ok <- the_election == ""
-          selected_text <- ifelse(dt_ok, text01, text02)
-          selected_text
-          #dt_ok
-        })
-
-        output$control_general <- renderText({
-          control_general()
-          ""
-        })
-
-
 
       })
 
+###---###---###---###---###---###---###---###---###---###---###---###---###---###
 
-      selected_var_name <- reactive({
-        req(database()) #, input$selected_var_name)
-        req(database())
-        input$selected_var_name
+      control_03 <- reactive({
 
-      })
-
-      selected_var_pos <- reactive({
-        req(database()) #, input$selected_var_name, selected_var_name())
-
-        vector_var_names <- colnames(database())
-        dt_pos <- vector_var_names == selected_var_name()
-
-        vector_pos <- 1:length(vector_var_names)
-
-        value_pos <- vector_pos[dt_pos]
-        value_pos
-
-      })
-
-
-
-
-
-      control_general <- reactive({
-
-        req(database(), selected_var_name(), selected_var_pos())
+        # # # Control sobre input$selected_var_name
+        req(control_02(), input$selected_var_name)
 
         validate(
-          need(!is.null(database()), 'Error 001: Problemas en la base de datos. Vuelva a cargar el archivo'),
-          need(!is.null(selected_var_name()), 'Error 002: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
-          need(!is.null(selected_var_pos()), 'Error 002: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+          need(!is.null(input$selected_var_name),   'Error 006: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
           errorClass = "ERROR"
         )
 
-        validate(
-          need((ncol(database())>= 1), 'Error 003: La base de datos debe contener al menos una columna.'),
-          need((nrow(database())>= 2), 'Error 004: La base de datos debe contener al menos una fila.'),
-          errorClass = "ERROR"
-        )
-
-        print(paste0("La eleccion: ", selected_var_name()))
-        print(sum(colnames(database()) == selected_var_name()) == 1)
-        print("\n")
-        print("\n")
 
         validate(
-          need(selected_var_name() != "", 'Seleccione una variable cuantitativa de su base de datos.'),
+          need(input$selected_var_name != "", 'Seleccione una variable cuantitativa de su base de datos.'),
           errorClass = "AVISO"
         )
 
+        return(TRUE)
+      })
+
+      selected_var_name <- shiny::reactiveVal()
+      selected_var_pos  <- shiny::reactiveVal()
+      selected_var_letter  <- shiny::reactiveVal()
+
+      shiny::observeEvent(input$selected_var_name,{
+
+
+        req(control_03())
+
+
+        # Nombre, posicion y letra de la variable seleccionada}
+        selected_var_name(input$selected_var_name)
+        selected_var_pos(match(selected_var_name(), vector_var_names()))
+        selected_var_letter(openxlsx::int2col(selected_var_pos()))
+
+
+
+
+      })
+###---###---###---###---###---###---###---###---###---###---###---###---###---###
+
+
+      control_04 <- reactive({
+
+        # # # Control sobre selected_var_***
+        req(control_03(), selected_var_name(), selected_var_pos(), selected_var_letter())
+
         validate(
-          need(sum(colnames(database()) == selected_var_name()) == 1, 'Error 005: El nombre de variable seleccionado no pertenece a la base.'),
+          need(!is.null(selected_var_name()),   'Error 007: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+          need(!is.null(selected_var_pos()),    'Error 008: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+          need(!is.null(selected_var_letter()), 'Error 009: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+          errorClass = "ERROR"
+        )
+
+
+
+        validate(
+          need(sum(colnames(database()) == selected_var_name()) == 1, 'Error 010: El nombre de variable seleccionado no pertenece a la base.'),
           errorClass = "ERROR"
         )
 
         validate(
-          need(ncol(database()) >= selected_var_pos(), 'Error 006: La posición de variable no pertenece a la base de datos.'),
+          need(ncol(database()) >= selected_var_pos(), 'Error 011: La posición de variable no pertenece a la base de datos.'),
           errorClass = "ERROR"
         )
 
 
-        vector_vr <- database()[,selected_var_pos()]
-
-        validate(
-         need((sum(is.na(vector_vr))==0), 'Error 007: La columna seleccionada posee al menos una celda sin datos. \n
-              Usted está trabajando con una base de datos que no corresponde a la Diplomatura.
-              En la diplomatura solo veremos código de R aplicable a bases de datos sin celdas vacías.'),
-         errorClass = "ERROR"
-        )
-
-        validate(
-          need((is.numeric(vector_vr)), 'Error 008: La variable seleccionada debe ser numérica. Verifique las siguientes opciones:\n
-               1) Se equivocó al seleccionar variable con la cual trabajar. La variable seleccionada debe ser cuantitativa.\n
-               2) No abrió la base de datos csv como archivo de texto en su computadora para tomar noción sobre
-               si el archivo tiene como primera fila al nombre de columnas, cual es el separador de columna
-               y del separador decimal.\n
-               3) Regrese al menú de carga, y verifique que todos las opciones seleccionadas correspondan con lo que usted observa en su archivo CSV en su computadora.
-               4) Si usted está trabajando con una base de datos que no corresponde a la Semana 01 de la Diplomatura, verifique que todas las celdas de la columna elegida solo contienen números.
-               Posiblemente alguna celda de la columna seleccionada posee algún caracter no numérico en alguna celda.\n'
-               ),
-          errorClass = "ERROR"
-          )
 
 
         return(TRUE)
@@ -443,79 +362,186 @@ module_diplo_001_clase01_server <- function(id){
       })
 
 
+      control_05 <- reactive({
 
-################################################################################
+        # # # Control "estadistico"
+        # # # Controlamos que vr:
+        # # # - No tenga celdas vacias.
+        # # # - Sea numerica.
+        # # # - Tenga al menos 1 dato.
 
-      the_time <- reactiveVal()
-      report_loc <- reactiveVal()
-      my_output_temp_folder   <- reactiveVal()
-      report_output_path_pdf  <- reactiveVal()
-      report_output_path_html <- reactiveVal()
-      report_output_path_word <- reactiveVal()
-      report_output_path_zip  <- reactiveVal()
+        req(control_04())
 
+
+        vector_vr <- database()[,selected_var_pos()]
+
+        validate(
+          need((sum(is.na(vector_vr))==0), 'Error 014: La columna seleccionada posee al menos una celda sin datos. \n
+              Usted, ¿está trabajando con una base de datos que no corresponde a la Diplomatura?.
+              La diplomatura es una iniciación a R por lo que solo veremos código de R aplicable a bases de datos sin celdas vacías.'),
+          errorClass = "ERROR"
+        )
+
+        validate(
+          need((is.numeric(vector_vr)), 'Error 015: La variable seleccionada no es numérica.
+          Las medidas resumen solo son aplicables a variables numéricas.
+          La variable seleccionada debe ser numérica.
+          Verifique las siguientes opciones:\n
+               1) Se equivocó al seleccionar variable con la cual trabajar. La variable seleccionada debe ser cuantitativa.\n
+               2) No abrió la base de datos csv como archivo de texto en su computadora para tomar noción sobre
+               si el archivo tiene como primera fila al nombre de columnas, cual es el separador de columna
+               y del separador decimal.\n
+               3) Regrese al menú de carga, y verifique que todos las opciones seleccionadas correspondan con lo que usted observa en su archivo CSV en su computadora.
+               4) Si usted está trabajando con una base de datos que no corresponde a la Semana 01 de la Diplomatura, verifique que todas las celdas de la columna elegida solo contienen números.
+               Posiblemente alguna celda de la columna seleccionada posee algún caracter no numérico en alguna celda.\n'
+          ),
+          errorClass = "ERROR"
+        )
+
+        validate(
+          need((length(vector_vr)>=1), 'Error 015: La columna seleccionada no posee datos. \n
+              Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
+          errorClass = "ERROR"
+        )
+
+        return(TRUE)
+
+      })
+
+      output$text_control_general <- renderText({
+        req(control_05())
+        ""
+      })
+
+
+
+###---###---###---###---###---###---###---###---###---###---###---###---###---###
+
+     # Enable/Disable - Render Report Button
+
+      render_button_status <- reactiveVal(FALSE)
+      observe({
+
+        ns <- session$ns
+
+        shinyjs::disable("render_report_button")
+        render_button_status(FALSE)
+
+        req(control_04())
+        if (!is.null(control_04())) {
+          if (control_04()) {
+          shinyjs::enable("render_report_button")
+          render_button_status(TRUE)
+          }
+        }
+
+      })
+
+
+      control_06 <- reactive({
+
+        # # # Control sobre input$render_report_button
+        #req(control_05(), input$render_report_button)
+        req(control_05(), input$render_report_button, render_button_status())
+
+        validate(
+          need(!is.null(input$render_report_button),   'Error 006: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+          errorClass = "ERROR"
+        )
+
+
+        return(TRUE)
+      })
+
+
+      # # # Render
+      the_time           <- reactiveVal()
+      output_temp_folder <- reactiveVal()
+      output_path_rmd    <- reactiveVal()
+      output_path_pdf    <- reactiveVal()
+      output_path_html   <- reactiveVal()
+      output_path_word   <- reactiveVal()
+      output_path_zip    <- reactiveVal()
 
       observeEvent(input$render_report_button, {
+
+        req(control_06())
+
         # Execution time...
         execution_time <- format(Sys.time(), "%Y_%m_%d_%H_%M_%S")
 
-        # File .Rmd
-        rmd_file_master <- "report_diplo_clase01_master.Rmd"
-        special_folder <- file.path("inst", "extdata", "rmd_diplo")
+        # Special folder
+        the_package_name <- "Rscience.Diplo"
+        special_folder <- file.path("inst", "extdata", "master_diplo", "clase01")
 
-        # Paths for rmd input
-        input_path_package   <- base::system.file(package = "Rscience.Diplo")
+        # # # ---- Input objects ---- # # #
+
+        input_old_str <- "_master"
+        input_new_str <- "_mod"
+        input_file_rmd   <- 'report_diplo_clase01_master.Rmd'
+        input_file_css   <- "styles.css"
+        input_file_png01 <- "fcefyn.png"
+        # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - #
+
+
+        # # # Folder package
+        # Depende de si lo toma como local o como parte del package
+        # En Desarrollo lo toma local.
+        # Para el usuario final lo toma como package.
+        # De esta forma corre bien para cualquiera de los dos.
+        input_path_package   <- base::system.file(package = the_package_name)
         input_folder_package <- file.path(input_path_package, special_folder)
         input_folder_local   <- file.path(getwd(), special_folder)
+        input_folder_master <-  ifelse(input_folder_package != "",
+                                       input_folder_package, input_folder_local)
 
-        # Input folder
-        input_folder_master <- ifelse(input_folder_package != "", input_folder_package, input_folder_local)
 
-        # Input files
-        input_file_rmd   <- 'report_diplo_clase01_master.Rmd'
-        input_file_png01 <- "fcefyn.png"
-        input_file_css <- "fcefyn.png"
-
-        # Input paths
+        # # # Input paths
         input_path_rmd   <- file.path(input_folder_master, input_file_rmd)
-        input_path_png01 <- file.path(input_folder_master, input_file_png01)
         input_path_css   <- file.path(input_folder_master, input_file_css)
+        input_path_png01 <- file.path(input_folder_master, input_file_png01)
 
-#        input_path_rmd <- normalizePath(input_file_rmd)
 
-        # File names
+        # Out File and paths
         p1_name <- tools::file_path_sans_ext(input_file_rmd)
         p2_name <- tools::file_ext(input_file_rmd)
 
         output_file_rmd   <- paste0(p1_name, "_", execution_time, ".", p2_name)
-        output_file_rmd   <- gsub(pattern = "_master",replacement = "_mod", x = output_file_rmd)
-        output_file_pdf   <- paste0(tools::file_path_sans_ext(output_file_rmd), ".pdf")
-        output_file_html  <- paste0(tools::file_path_sans_ext(output_file_rmd), ".html")
-        output_file_word  <- paste0(tools::file_path_sans_ext(output_file_rmd), ".docx")
-        output_file_zip   <- paste0(tools::file_path_sans_ext(output_file_rmd), ".zip")
+        output_file_rmd   <- gsub(pattern = input_old_str,
+                                  replacement = input_new_str,
+                                  x = output_file_rmd)
+
+        output_file_css   <- input_file_css
+        output_file_png01 <- input_file_png01
+
+        output_general_name <- tools::file_path_sans_ext(output_file_rmd)
+        output_file_pdf     <- paste0(output_general_name, ".pdf")
+        output_file_html    <- paste0(output_general_name, ".html")
+        output_file_word    <- paste0(output_general_name, ".docx")
+        output_file_zip     <- paste0(output_general_name, ".zip")
 
         # Output folder and output paths
         new_temp_folder <- tempdir()
         #new_temp_folder <- normalizePath("super_folder")
-        output_path_rmd  <- file.path(new_temp_folder, output_file_rmd)
-        output_path_pdf  <- file.path(new_temp_folder, output_file_pdf)
-        output_path_html <- file.path(new_temp_folder, output_file_html)
-        output_path_word <- file.path(new_temp_folder, output_file_word)
-        output_path_zip  <- file.path(new_temp_folder, output_file_zip)
-        output_path_png01  <- file.path(new_temp_folder, input_file_png01)
-        output_path_css <- file.path(new_temp_folder, input_file_css)
+        output_path_rmd    <- file.path(new_temp_folder, output_file_rmd)
+        output_path_png01  <- file.path(new_temp_folder, output_file_png01)
+        output_path_css    <- file.path(new_temp_folder, output_file_css)
+        output_path_pdf    <- file.path(new_temp_folder, output_file_pdf)
+        output_path_html   <- file.path(new_temp_folder, output_file_html)
+        output_path_word   <- file.path(new_temp_folder, output_file_word)
+        output_path_zip    <- file.path(new_temp_folder, output_file_zip)
 
-        # Copy from original .Rmd
-        #file.copy(input_path_rmd, output_path_rmd, overwrite = TRUE)
+        # Copy from original input files
+        file.copy(from = input_path_rmd,   to = output_path_rmd,   overwrite = TRUE)
         file.copy(from = input_path_png01, to = output_path_png01, overwrite = TRUE)
-        file.copy(from = input_path_css,   to = output_path_css, overwrite = TRUE)
+        file.copy(from = input_path_css,   to = output_path_css,   overwrite = TRUE)
 
         # Objetos de entorno
         render_env <- new.env()
         render_env$"BASE" <- database()
 
         # Objetos de reemplazo
-        #print(names())
+
 
         replacement_list <- list()
         replacement_list$"selected_var_pos" <- selected_var_pos()
@@ -526,7 +552,7 @@ module_diplo_001_clase01_server <- function(id){
         replacement_list$".user_sAF" <- FALSE
 
         # Aplicacion de modificaciones
-        lineas_modificadas <- readLines(input_path_rmd)
+        lineas_modificadas <- readLines(output_path_rmd)
 
         for (k in 1:length(replacement_list)){
           selected_name <- names(replacement_list)[k]
@@ -549,14 +575,63 @@ module_diplo_001_clase01_server <- function(id){
 
         # Add info to ReactiveVals()...
         the_time(execution_time)
-        my_output_temp_folder(new_temp_folder)
-        report_output_path_pdf(output_path_pdf)
-        report_output_path_html(output_path_html)
-        report_output_path_word(output_path_word)
-        report_output_path_zip(output_path_zip)
-        report_loc(list.files(new_temp_folder, full.names = TRUE))
+        output_temp_folder(new_temp_folder)
+        output_path_rmd(output_path_rmd)
+        output_path_pdf(output_path_pdf)
+        output_path_html(output_path_html)
+        output_path_word(output_path_word)
+        output_path_zip(output_path_zip)
+
 
       })
+
+      control_07 <- reactive({
+
+        print(paste0("control_06: ", control_06()))
+        print(paste0("02: ", input$render_report_button > 0))
+        print(paste0("the_time(): ", the_time()))
+        print(paste0("output_temp_folder(): ", output_temp_folder()))
+        print(paste0("output_path_rmd(): ", file.exists(output_path_rmd())))
+        print(paste0("output_path_pdf(): ", file.exists(output_path_pdf())))
+        print(paste0("output_path_html(): ", file.exists(output_path_html())))
+        print(paste0("output_path_word(): ", file.exists(output_path_word())))
+        print(paste0("output_path_zip(): ", file.exists(output_path_zip())))
+
+
+        # # # Control sobre input$render_report_button
+        #req(control_05(), input$render_report_button)
+        req(control_06(), input$render_report_button > 0,
+            the_time(), output_temp_folder(),
+            output_path_rmd(), output_path_pdf(), output_path_html(),
+            output_path_word(), output_path_zip())
+
+
+
+        validate(
+          need(file.exists(output_path_rmd()),   'Error 0777777: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+          errorClass = "ERROR"
+        )
+        validate(
+          need(file.exists(output_path_pdf()),   'Error 0777777: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+          errorClass = "ERROR"
+        )
+
+        validate(
+          need(file.exists(output_path_html()),   'Error 0777777: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+          errorClass = "ERROR"
+        )
+        validate(
+          need(file.exists(output_path_word()),   'Error 0777777: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+          errorClass = "ERROR"
+        )
+        # validate(
+        #   need(file.exists(output_path_zip()),   'Error 0777777: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+        #   errorClass = "ERROR"
+        # )
+        return(TRUE)
+      })
+
+
 
       control_user_pdf <- reactive({
         validate(
@@ -564,10 +639,10 @@ module_diplo_001_clase01_server <- function(id){
           need(input$render_report_button != 0, "Render PDF not executed.")
         )
 
-        aver <- input$render_report_button > 0 && !is.null(report_output_path_pdf())
+        aver <- input$render_report_button > 0 && !is.null(output_path_pdf())
         validate(
           need(aver, "Loading..."),
-          need(file.exists(report_output_path_pdf()), "Loading...")
+          need(file.exists(output_path_pdf()), "Loading...")
         )
         return(TRUE)
       })
@@ -576,17 +651,25 @@ module_diplo_001_clase01_server <- function(id){
 
         ns <- session$ns
 
-        if (!is.null(report_output_path_pdf())) {
+        shinyjs::disable("download_button_pdf")
+        shinyjs::disable("download_button_html")
+        shinyjs::disable("download_button_word")
+        shinyjs::disable("download_button_zip")
+
+        print(control_07())
+
+        req(control_07())
+
+        if (!is.null(control_07())) {
+          if (control_07()) {
           shinyjs::enable("download_button_pdf")
           shinyjs::enable("download_button_html")
           shinyjs::enable("download_button_word")
           shinyjs::enable("download_button_zip")
-        } else {
-          shinyjs::disable("download_button_pdf")
-          shinyjs::disable("download_button_html")
-          shinyjs::disable("download_button_word")
-          shinyjs::disable("download_button_zip")
+          }
         }
+
+
       })
 
       output$pdfviewer_online <- renderText({
@@ -604,11 +687,11 @@ module_diplo_001_clase01_server <- function(id){
       output$pdfviewer_temporal <- renderText({
         req(control_user_pdf())
 
-        my_path <- my_output_temp_folder()
-        addResourcePath(prefix = "my_output_temp_folder", directoryPath = my_path)
+        my_path <- output_temp_folder()
+        addResourcePath(prefix = "output_temp_folder", directoryPath = my_path)
 
-        my_file <- basename(report_output_path_pdf())
-        my_local_file <- file.path("my_output_temp_folder", my_file)
+        my_file <- basename(output_path_pdf())
+        my_local_file <- file.path("output_temp_folder", my_file)
 
         return(paste('<iframe style="height:600px; width:100%" src="', my_local_file, '"></iframe>', sep = ""))
       })
@@ -616,20 +699,203 @@ module_diplo_001_clase01_server <- function(id){
       output$htmlviewer_temporal <- renderText({
         req(control_user_pdf())
 
-        my_path <- my_output_temp_folder()
-        addResourcePath(prefix = "my_output_temp_folder", directoryPath = my_path)
+        my_path <- output_temp_folder()
+        addResourcePath(prefix = "output_temp_folder", directoryPath = my_path)
 
-        my_file <- basename(report_output_path_html())
-        my_local_file <- file.path("my_output_temp_folder", my_file)
+        my_file <- basename(output_path_html())
+        my_local_file <- file.path("output_temp_folder", my_file)
 
         armado_v <- paste('<div style="height: 1000vh; width: 100%; overflow: hidden;"><iframe style="height: 1000vh; width:100%; border: none;" src="', my_local_file, '"></iframe></div>', sep = "")
-        print(armado_v)
+
         return(armado_v)
       })
 
-      output$magia <- renderUI({
 
-        req(control_general())
+
+      output$download_button_pdf <- downloadHandler(
+        filename = function() {
+          basename(output_path_pdf())
+        },
+        content = function(file) {
+          file.copy(output_path_pdf(), file, overwrite = TRUE)
+        }
+      )
+
+      output$download_button_html <- downloadHandler(
+        filename = function() {
+          basename(output_path_html())
+        },
+        content = function(file) {
+          file.copy(output_path_html(), file, overwrite = TRUE)
+        }
+      )
+
+      output$download_button_word <- downloadHandler(
+        filename = function() {
+          basename(output_path_word())
+        },
+        content = function(file) {
+          file.copy(output_path_word(), file, overwrite = TRUE)
+        }
+      )
+
+      output$download_button_zip <- downloadHandler(
+        filename = function() {
+          basename(output_path_zip())
+        },
+        content = function(file) {
+          files <- c(output_path_pdf(), output_path_html(), output_path_word())
+          zip(file, files)
+        }
+      )
+
+
+    }) # Fin Module
+}
+
+
+module_diplo_001_clase01_serverB <- function(id){
+
+  moduleServer(
+    id,
+    function(input, output, session) {
+
+      # ns para el server!
+      ns <- session$ns
+
+      output$box01_database <- renderUI({
+
+  shinydashboard::box(
+    title = "01 - Seleccionar base de datos",
+    status = "primary",
+    id = ns("my_box01"),
+    solidHeader = TRUE,
+    collapsible = TRUE,
+    collapsed = TRUE,
+    closable = FALSE,
+    width = 12,
+    fluidRow(
+      column(3,
+             shiny::selectInput(
+               inputId = ns("data_source"),
+               label = "Fuente de datos",
+               choices = c("R examples" = "r_source", "CSV files" = "csv_source", "Diplo UNC" = "diplo_source")
+             )
+      )
+    ),
+    shiny::br(),
+    shiny::br(),
+    shiny::conditionalPanel(
+      condition = "input.data_source == 'r_source'",
+      ns = ns,
+      fluidRow(
+        column(3,
+               shiny::selectInput(
+                 inputId = ns("r_database"),
+                 label = "Bases de R",
+                 choices = c("01 - mtcars" = "mtcars", "02 - iris" = "iris")
+               )
+        )
+      )
+    ),
+    shiny::conditionalPanel(
+      condition = "input.data_source == 'csv_source'",
+      ns = ns,
+      fluidRow(
+        column(4,
+               fileInput(
+                 inputId = ns("csv_file_path"),
+                 label = "Elija un archivo CSV",
+                 #accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
+                 accept = "*/*"
+               )
+        )
+      ),
+      fluidRow(
+        column(1, radioButtons(
+          inputId = ns("header"),
+          label = "header",
+          choices = c("TRUE" = TRUE, "FALSE" = FALSE),
+          selected = TRUE
+        )),
+        column(2, radioButtons(
+          inputId = ns("sep"),
+          label = "Separador de columnas",
+          choices = c("semicolon (;)" = ";", "comma (,)" = ","),
+          selected = ";"
+        )),
+        column(2, radioButtons(
+          inputId = ns("dec"),
+          label = "Decimal",
+          choices = c("Period (.)" = ".", "Comma (,)" = ","),
+          selected = "."
+        )),
+        column(2, radioButtons(
+          inputId = ns("quote"),
+          label = "Comillas",
+          choices = c("Double quotes (\")" = "\"", "Simple quotes (')" = "'"),
+          selected = "\""
+        ))
+      ),
+      tags$hr()
+    ),
+    shiny::br(),
+    shiny::br(),
+    #DT::dataTableOutput(ns("table_database2")),
+    DT::DTOutput(ns("table_database")),
+    shiny::br(),
+    shiny::br()
+  )
+
+      })
+
+
+      output$box02_var_selector <- renderUI({
+
+        shinydashboard::box(
+          title = "02 - Estadísticas y Código de R",
+          status = "primary",
+          id = ns("my_box02"),
+          solidHeader = TRUE,
+          collapsible = TRUE,
+          collapsed = FALSE,
+          closable = FALSE,
+          width = 12,
+          shiny::uiOutput(ns("var_selector"))
+
+        )
+      })
+
+
+      output$box03_control_de_mision <- renderUI({
+
+        shinydashboard::box(
+          title = "03 - Control de Misión",
+          status = "primary",
+          id = ns("my_box03"),
+          solidHeader = TRUE,
+          collapsible = TRUE,
+          collapsed = FALSE,
+          closable = FALSE,
+          width = 12,
+          div(
+            #h2("Generacion de Reportes"), br(),
+            h3("- Base de datos - OK!"),
+            h3("- Variable cuantitativa seleccionada - OK!"),
+            h3("- Reporte y script - OK!"),
+            actionButton(ns("render_report_button"), "Render Report", width = "100%"),
+            downloadButton(outputId = ns('download_button_pdf'), label = "Download PDF", width = "100%", disabled = TRUE),
+            downloadButton(outputId = ns('download_button_html'), label = "Download HTML", width = "100%", disabled = TRUE),
+            downloadButton(outputId = ns('download_button_word'), label = "Download WORD", width = "100%", disabled = TRUE),
+            downloadButton(outputId = ns('download_button_zip'), label = "Download All (ZIP)", width = "100%", disabled = TRUE)
+          )
+        )
+      })
+
+
+      output$box04_report <- renderUI({
+
+        #req(control_03())
         ns <- NS(id)
 
         shinydashboard::box(
@@ -641,16 +907,16 @@ module_diplo_001_clase01_server <- function(id){
           collapsed = FALSE,
           closable = FALSE,# Colapsado por defecto
           width = 12,
-              div(
-              # fluidRow(
-              #   column(4, h2("Temporal()"),
-              #          shinycssloaders::withSpinner(htmlOutput(ns('pdfviewer_temporal'))))
-              #   ),
-              fluidRow(
-                column(12, h2("EL HTML"),
-                       shinycssloaders::withSpinner(htmlOutput(ns("htmlviewer_temporal"))))
-              )
-              )
+          div(
+            # fluidRow(
+            #   column(4, h2("Temporal()"),
+            #          shinycssloaders::withSpinner(htmlOutput(ns('pdfviewer_temporal'))))
+            #   ),
+            fluidRow(
+              column(12, h2("EL HTML"),
+                     shinycssloaders::withSpinner(htmlOutput(ns("htmlviewer_temporal"))))
+            )
+          )
         )
 
         # div(
@@ -664,47 +930,7 @@ module_diplo_001_clase01_server <- function(id){
         #   )
         # )
       })
-
-      output$download_button_pdf <- downloadHandler(
-        filename = function() {
-          basename(report_output_path_pdf())
-        },
-        content = function(file) {
-          file.copy(report_output_path_pdf(), file, overwrite = TRUE)
-        }
-      )
-
-      output$download_button_html <- downloadHandler(
-        filename = function() {
-          basename(report_output_path_html())
-        },
-        content = function(file) {
-          file.copy(report_output_path_html(), file, overwrite = TRUE)
-        }
-      )
-
-      output$download_button_word <- downloadHandler(
-        filename = function() {
-          basename(report_output_path_word())
-        },
-        content = function(file) {
-          file.copy(report_output_path_word(), file, overwrite = TRUE)
-        }
-      )
-
-      output$download_button_zip <- downloadHandler(
-        filename = function() {
-          basename(report_output_path_zip())
-        },
-        content = function(file) {
-          files <- c(report_output_path_pdf(), report_output_path_html(), report_output_path_word())
-          zip(file, files)
-        }
-      )
-
-
-    }) # Fin Module
+    }
+)
 }
-
-
 

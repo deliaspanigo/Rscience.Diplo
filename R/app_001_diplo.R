@@ -66,6 +66,7 @@ server <- function(input, output) {
   module_diplo_001_clase99_server("space_clase99")
 
   module_diplo_001_clase01_server("space_clase01")
+  module_diplo_001_clase01_serverB("space_clase01")
 } #--- Fin server
 
 # Ejecutar la aplicación
