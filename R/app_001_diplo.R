@@ -17,7 +17,7 @@ app_001_diplo <- function(){
 
   # Definir la interfaz de usuario
 ui <- shinydashboard::dashboardPage(
-  shinydashboard::dashboardHeader(title = "Rscience - Diplo"),
+  shinydashboard::dashboardHeader(title = "Rscience"),
 
   shinydashboard::dashboardSidebar(
     shinydashboard::sidebarMenu(

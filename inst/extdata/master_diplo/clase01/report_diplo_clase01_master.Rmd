@@ -28,9 +28,17 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 ## Diplomatura en Bioestadística básica aplicada mediada con R
-### Clase 01 - Medidas Resumen
-### Hora de ejecución: `r the_time`
 
+#### Hora de ejecución: `r the_time`
+#### Sistema operativo: `r Sys.info()["sysname"]`
+#### Versión de R: `r R.version.string`
+#### Versión de RStudio: `r RStudio.Version()$version`
+#### Versión de Rscience.Diplo: `r packageVersion("Rscience.Diplo")`
+
+<br>
+<br>
+
+## Clase 01 - Medidas Resumen
 
 ```{r,  include =FALSE}
 knitr::opts_chunk$set(echo=TRUE, comment=NA)
