@@ -646,7 +646,8 @@ module_diplo_001_clase01_server <- function(id){
 
         # # # Special folder
         the_package_name <- "Rscience.Diplo"
-        special_folder <- file.path("inst", "extdata", "master_diplo", "clase01")
+        special_folder_package <- file.path("extdata", "master_diplo", "clase01")
+        special_folder_local <- file.path("inst", "extdata", "master_diplo", "clase01")
 
         # # # ---- Input objects ---- # # #
         input_old_str <- "_master"
@@ -667,9 +668,13 @@ module_diplo_001_clase01_server <- function(id){
         # Para el usuario final lo toma como package.
         # De esta forma corre bien para cualquiera de los dos.
         input_path_package   <- base::system.file(package = the_package_name)
-        input_folder_package <- file.path(input_path_package, special_folder)
-        input_folder_local   <- file.path(getwd(), special_folder)
-        input_folder_master <-  ifelse(input_folder_package != "",
+        input_folder_package <- file.path(input_path_package, special_folder_package)
+        input_folder_local   <- file.path(getwd(), special_folder_local)
+
+        check_cantidad_files_local <- length(list.files(input_folder_local)) > 0
+        check_cantidad_files_package <- length(list.files(input_folder_package)) > 0
+
+        input_folder_master <-  ifelse(check_cantidad_files_package,
                                        input_folder_package, input_folder_local)
 
 
