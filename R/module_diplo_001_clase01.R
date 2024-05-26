@@ -26,7 +26,8 @@ module_diplo_001_clase01_ui <- function(id){
         }
       "))
     ),
-    includeCSS("inst/www/style.css"),
+    includeCSS(base::system.file("inst", "www","style.css", package = "Rscience.Diplo")),
+#    includeCSS("inst/www/style.css"),
     shinyjs::useShinyjs(),
     id = ns("input-panel"),
     shiny::h1("Clase 01"),
