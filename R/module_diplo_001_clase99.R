@@ -499,7 +499,7 @@ module_diplo_001_clase99_server <- function(id){
         div(
           fluidRow(
             column(4, h2("Web pdf file"), htmlOutput(ns('pdfviewer_online'))),
-            column(4, h2("Local file with addResourcePath()"), htmlOutput(ns('pdfviewer_local'))),
+            #column(4, h2("Local file with addResourcePath()"), htmlOutput(ns('pdfviewer_local'))),
             column(4, h2("Temporal()"), shinycssloaders::withSpinner(htmlOutput(ns('pdfviewer_temporal'))))
           ), br(), br(),
           fluidRow(
