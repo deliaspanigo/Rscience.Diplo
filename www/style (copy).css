@@ -1,0 +1,87 @@
+/* Cambiar el color del fondo del box */
+.box {
+  background-color: #e0f7fa; /* Se cambia el color de fondo a celeste agua */
+}
+
+/* Cambiar el color del borde del box */
+.box.box-primary {
+  border-color: #00bcd4; /* Se cambia el color del borde a un tono más oscuro de celeste agua */
+}
+
+/* Cambiar el color del texto del título del box */
+.box-title {
+  color: #00bcd4; /* Se cambia el color del texto del título a un tono más oscuro de celeste agua */
+}
+
+/* Aumentar el tamaño del signo "+" */
+.box-header .fa.fa-plus:before {
+  font-size: 1.5em; /* Se aumenta el tamaño del signo "+" a 1.5 veces el tamaño por defecto */
+}
+
+/* Aumentar el tamaño del signo "-" */
+.box-header .fa.fa-minus:before {
+  font-size: 1.5em; /* Se aumenta el tamaño del signo "-" a 1.5 veces el tamaño por defecto */
+}
+
+/* Font del título del encabezado */
+.main-header .logo {
+  font-family: "helvetica",  serif, Times, "Times New Roman"; /* Se especifica la fuente del título */
+  font-weight: bold; /* Se establece el peso de la fuente como negrita */
+  font-size: 24px; /* Se establece el tamaño de la fuente del título */
+}
+
+/* Color de fondo del encabezado (parte del logo) */
+.skin-blue .main-header .logo {
+  background-color: #b2ebf2; /* Se cambia el color de fondo del logo a un tono más oscuro de celeste agua */
+}
+
+/* Color de fondo del logo al pasar el mouse */
+.skin-blue .main-header .logo:hover {
+  background-color: #80deea; /* Se cambia el color de fondo del logo a un tono más claro de celeste agua al pasar el mouse */
+}
+
+/* Color de fondo para la parte restante del encabezado */
+.skin-blue .main-header .navbar {
+  background-color: #b2ebf2; /* Se cambia el color de fondo de la parte restante del encabezado a un tono más oscuro de celeste agua */
+}
+
+/* Botón de alternar al pasar el mouse */
+.skin-blue .main-header .navbar .sidebar-toggle:hover {
+  background-color: #80deea; /* Se cambia el color de fondo del botón de alternar a un tono más claro de celeste agua al pasar el mouse */
+}
+
+/* Barra lateral principal */
+.skin-blue .main-sidebar {
+  background-color: #b2ebf2; /* Se cambia el color de fondo de la barra lateral principal a un tono más oscuro de celeste agua */
+}
+
+/* Elemento del menú lateral activo */
+.skin-blue .main-sidebar .sidebar .sidebar-menu .active a {
+  background-color: #ffffff; /* Se cambia el color de fondo del elemento del menú lateral activo a blanco */
+  color: #000000; /* Se cambia el color del texto del elemento del menú lateral activo a negro */
+}
+
+/* Elementos del menú lateral al pasar el mouse */
+.skin-blue .main-sidebar .sidebar .sidebar-menu a:hover {
+  background-color: #80deea; /* Se cambia el color de fondo de los elementos del menú lateral al pasar el mouse a un tono más claro de celeste agua */
+  color: #ffffff; /* Se cambia el color del texto de los elementos del menú lateral al pasar el mouse a blanco */
+}
+
+/* Cuerpo */
+.content-wrapper, .right-side {
+  background-color: #e0f7fa; /* Se cambia el color de fondo del cuerpo a celeste agua */
+}
+
+/* Encabezado de caja sólida */
+.box.box-solid.box-primary>.box-header {
+  background: #b2ebf2; /* Se cambia el color de fondo del encabezado de la caja sólida a un tono más oscuro de celeste agua */
+}
+
+/* Caja sólida primaria */
+.box.box-solid.box-primary {
+  border-bottom-color: #b2ebf2; /* Se cambia el color del borde inferior de la caja sólida primaria a un tono más oscuro de celeste agua */
+  border-left-color: #b2ebf2; /* Se cambia el color del borde izquierdo de la caja sólida primaria a un tono más oscuro de celeste agua */
+  border-right-color: #b2ebf2; /* Se cambia el color del borde derecho de la caja sólida primaria a un tono más oscuro de celeste agua */
+  border-top-color: #b2ebf2; /* Se cambia el color del borde superior de la caja sólida primaria a un tono más oscuro de celeste agua */
+}
+

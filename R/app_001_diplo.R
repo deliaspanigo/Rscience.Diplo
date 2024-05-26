@@ -11,10 +11,13 @@ app_001_diplo <- function(){
   library(openxlsx)
   library(shinyjs)
   library(rmarkdown)
+  #ruta_css <- system.file("www", "estilos.css", package = "miPaquete")
+
+#includeCSS(ruta_css)
 
   # Definir la interfaz de usuario
 ui <- shinydashboard::dashboardPage(
-  shinydashboard::dashboardHeader(title = "Mi primer dashboard"),
+  shinydashboard::dashboardHeader(title = "Rscience - Diplo"),
 
   shinydashboard::dashboardSidebar(
     shinydashboard::sidebarMenu(
@@ -67,6 +70,7 @@ server <- function(input, output) {
 
   module_diplo_001_clase01_server("space_clase01")
   module_diplo_001_clase01_serverB("space_clase01")
+  #module_diplo_001_clase01_serverC("space_clase01")
 } #--- Fin server
 
 # Ejecutar la aplicación

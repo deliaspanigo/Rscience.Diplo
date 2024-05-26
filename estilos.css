@@ -1,0 +1,15 @@
+/* Cambiar el color del fondo del box */
+.box {
+  background-color: #f0f0f0; /* Color gris claro */
+}
+
+/* Cambiar el color del borde del box */
+.box.box-primary {
+  border-color: #337ab7; /* Color azul */
+}
+
+/* Cambiar el color del texto del título del box */
+.box-title {
+  color: #337ab7; /* Color azul */
+}
+
