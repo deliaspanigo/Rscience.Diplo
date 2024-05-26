@@ -5,6 +5,17 @@
 module_diplo_001_clase01_ui <- function(id){
   ns <- shiny::NS(id)
 
+  the_package_name <- "Rscience.Diplo"
+  special_folder <- file.path("inst", "www")
+
+  input_path_package   <- base::system.file(package = the_package_name)
+  input_folder_package <- file.path(input_path_package, special_folder)
+  input_folder_local   <- file.path(getwd(), special_folder)
+  input_folder_master <-  ifelse(input_folder_package != "",
+                                 input_folder_package, input_folder_local)
+
+  input_path_css <- file.path(input_folder_master, "style.css")
+
   div(
     tags$head(
       #tags$link(rel = "stylesheet", type = "text/css", href = "inst/estilos.css"),
@@ -26,7 +37,7 @@ module_diplo_001_clase01_ui <- function(id){
         }
       "))
     ),
-    includeCSS(base::system.file("inst", "www","style.css", package = "Rscience.Diplo")),
+    includeCSS(input_path_css ),
 #    includeCSS("inst/www/style.css"),
     shinyjs::useShinyjs(),
     id = ns("input-panel"),

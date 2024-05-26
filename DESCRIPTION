@@ -13,6 +13,7 @@ Imports:
   openxlsx,
   rmarkdown,
   shiny,
-  shinyjs,
+  shinycssloaders,
   shinydashboard,
+  shinyjs,  
   utils
