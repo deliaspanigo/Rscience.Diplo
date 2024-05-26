@@ -10,6 +10,9 @@ RoxygenNote: 7.3.1
 Imports:
   DT,
   markdown,
+  openxlsx,
   rmarkdown,
   shiny,
-  shinydashboard
+  shinyjs,
+  shinydashboard,
+  utils
