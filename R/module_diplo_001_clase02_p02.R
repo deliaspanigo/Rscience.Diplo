@@ -2,7 +2,7 @@
 
 
 # # # 01) UI - Selection for 'database'
-module_diplo_001_clase01_ui <- function(id){
+module_diplo_001_clase02_p02_ui <- function(id){
   ns <- shiny::NS(id)
 
   the_package_name <- "Rscience.Diplo"
@@ -38,10 +38,10 @@ module_diplo_001_clase01_ui <- function(id){
       "))
     ),
     includeCSS(system.file("www/style.css", package = "Rscience.Diplo")),
-#    includeCSS("inst/www/style.css"),
+    #    includeCSS("inst/www/style.css"),
     shinyjs::useShinyjs(),
     id = ns("input-panel"),
-    shiny::h1("Clase 01 - Medidas Resumen para 1 Variable Cuantitativa"),
+    shiny::h1("Clase 02 - Parte 02 - Gráficos para 1 Variable Cuantitativa"),
     shiny::fluidRow(
       shiny::column(12,
 
@@ -76,7 +76,7 @@ module_diplo_001_clase01_ui <- function(id){
 
 
 
-module_diplo_001_clase01_server <- function(id){
+module_diplo_001_clase02_p02_server <- function(id){
 
   moduleServer(
     id,
@@ -137,26 +137,26 @@ module_diplo_001_clase01_server <- function(id){
           )
         } else
 
-         # Si el archivo es una base de R...
-            if(input$"data_source" == "diplo_source"){
+          # Si el archivo es una base de R...
+          if(input$"data_source" == "diplo_source"){
 
-              req(input$diplo_database)
+            req(input$diplo_database)
+
+            validate(
+              need(exists(input$diplo_database), 'Error 002: La base seleccionada de la Diplomatura no se encuentra en el entorno de R.\n'),
+              errorClass = "ERROR"
+            )
+          } else
+            # Si el archivo es una base de R...
+            if(input$"data_source" == "r_source"){
+
+              req(input$r_database)
 
               validate(
-                need(exists(input$diplo_database), 'Error 002: La base seleccionada de la Diplomatura no se encuentra en el entorno de R.\n'),
+                need(exists(input$r_database), 'Error 002: La base de R seleccionada no se encuentra en el entorno de R.\n'),
                 errorClass = "ERROR"
               )
-            } else
-              # Si el archivo es una base de R...
-              if(input$"data_source" == "r_source"){
-
-                req(input$r_database)
-
-                validate(
-                  need(exists(input$r_database), 'Error 002: La base de R seleccionada no se encuentra en el entorno de R.\n'),
-                  errorClass = "ERROR"
-                )
-              }
+            }
 
 
         shinyjs::enable("action_load")
@@ -271,27 +271,27 @@ module_diplo_001_clase01_server <- function(id){
         if(input$data_source == "csv_source"){
 
           database(utils::read.csv(file = input$csv_file_path$datapath,
-                              header = as.logical(as.character(input$csv_header)),
-                              sep = input$csv_sep,
-                              dec = input$csv_dec,
-                              stringsAsFactors = FALSE)
-            )
+                                   header = as.logical(as.character(input$csv_header)),
+                                   sep = input$csv_sep,
+                                   dec = input$csv_dec,
+                                   stringsAsFactors = FALSE)
+          )
 
 
-          } else
+        } else
 
           if(input$data_source == "diplo_source"){
 
-              database(base::eval(base::parse(text = input$"diplo_database")))
-            } else
+            database(base::eval(base::parse(text = input$"diplo_database")))
+          } else
 
             if(input$data_source == "r_source"){
 
-                database(base::eval(base::parse(text = input$"r_database")))
+              database(base::eval(base::parse(text = input$"r_database")))
             }
 
 
-        })
+      })
 
 
 
@@ -329,7 +329,7 @@ module_diplo_001_clase01_server <- function(id){
       output$table_database <- DT::renderDT({
 
 
-       req(control_03())
+        req(control_03())
 
         # Usar lapply para mostrar los elementos deseados
 
@@ -612,13 +612,13 @@ module_diplo_001_clase01_server <- function(id){
 
         # # # Special folder
         the_package_name <- "Rscience.Diplo"
-        special_folder_package <- file.path("extdata", "master_diplo", "clase01")
-        special_folder_local <- file.path("inst", "extdata", "master_diplo", "clase01")
+        special_folder_package <- file.path("extdata", "master_diplo", "clase02_p02")
+        special_folder_local <- file.path("inst", "extdata", "master_diplo", "clase02_p02")
 
         # # # ---- Input objects ---- # # #
         input_old_str <- "_master"
         input_new_str <- "_mod"
-        input_file_rmd   <- 'report_diplo_clase01_master.Rmd'
+        input_file_rmd   <- 'report_diplo_clase02_p02_master.Rmd'
         input_file_css   <- "styles.css"
         input_file_png01 <- "logo_01_unc.png"
         input_file_png02 <- "logo_02_fcefyn.png"
@@ -940,7 +940,7 @@ module_diplo_001_clase01_server <- function(id){
 }
 
 
-module_diplo_001_clase01_serverB <- function(id){
+module_diplo_001_clase02_p02_serverB <- function(id){
 
   moduleServer(
     id,
@@ -971,83 +971,83 @@ module_diplo_001_clase01_serverB <- function(id){
                    )
             ),
             column(7,
-             div(shinyjs::useShinyjs(), id = ns("input-var-02-A"),
-              shiny::conditionalPanel(
-                condition = "input.data_source == 'csv_source'",
-                ns = ns,
-                fluidRow(
-                  column(4,
-                         fileInput(
-                           inputId = ns("csv_file_path"),
-                           label = "Elija un archivo CSV",
-                           accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
-                           #accept = "*/*"
+                   div(shinyjs::useShinyjs(), id = ns("input-var-02-A"),
+                       shiny::conditionalPanel(
+                         condition = "input.data_source == 'csv_source'",
+                         ns = ns,
+                         fluidRow(
+                           column(4,
+                                  fileInput(
+                                    inputId = ns("csv_file_path"),
+                                    label = "Elija un archivo CSV",
+                                    accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
+                                    #accept = "*/*"
+                                  )
+                           )
+                         ),
+                         fluidRow(
+                           column(1, radioButtons(
+                             inputId = ns("csv_header"),
+                             label = "header",
+                             choices = c("TRUE" = TRUE, "FALSE" = FALSE),
+                             selected = TRUE
+                           )),
+                           column(3, radioButtons(
+                             inputId = ns("csv_sep"),
+                             label = "Separador de columnas",
+                             choices = c("semicolon (;)" = ";", "comma (,)" = ","),
+                             selected = ";"
+                           )),
+                           column(2, radioButtons(
+                             inputId = ns("csv_dec"),
+                             label = "Decimal",
+                             choices = c("Period (.)" = ".", "Comma (,)" = ","),
+                             selected = "."
+                           )),
+                           column(3, radioButtons(
+                             inputId = ns("csv_quote"),
+                             label = "Comillas",
+                             choices = c("Double quotes (\")" = "\"", "Simple quotes (')" = "'"),
+                             selected = "\""
+                           ))
+                         )#,
+                         #tags$hr()
+                       )
+                   ),
+                   div(shinyjs::useShinyjs(), id = ns("input-var-02-B"),
+                       shiny::conditionalPanel(
+                         condition = "input.data_source == 'diplo_source'",
+                         ns = ns,
+                         fluidRow(
+                           column(5,
+                                  shiny::selectInput(
+                                    inputId = ns("diplo_database"),
+                                    label = "Bases de la Diplomatura",
+                                    choices = c("01 - SEMANA01_BASE01_PESOS"  = "SEMANA01_BASE01_PESOS",
+                                                "02 - SEMANA01_BASE02_ALTURA" = "SEMANA01_BASE02_ALTURA")
+                                  )
+                           )
                          )
-                  )
-                ),
-                fluidRow(
-                  column(1, radioButtons(
-                    inputId = ns("csv_header"),
-                    label = "header",
-                    choices = c("TRUE" = TRUE, "FALSE" = FALSE),
-                    selected = TRUE
-                  )),
-                  column(3, radioButtons(
-                    inputId = ns("csv_sep"),
-                    label = "Separador de columnas",
-                    choices = c("semicolon (;)" = ";", "comma (,)" = ","),
-                    selected = ";"
-                  )),
-                  column(2, radioButtons(
-                    inputId = ns("csv_dec"),
-                    label = "Decimal",
-                    choices = c("Period (.)" = ".", "Comma (,)" = ","),
-                    selected = "."
-                  )),
-                  column(3, radioButtons(
-                    inputId = ns("csv_quote"),
-                    label = "Comillas",
-                    choices = c("Double quotes (\")" = "\"", "Simple quotes (')" = "'"),
-                    selected = "\""
-                  ))
-                )#,
-                #tags$hr()
-              )
-              ),
-              div(shinyjs::useShinyjs(), id = ns("input-var-02-B"),
-              shiny::conditionalPanel(
-                condition = "input.data_source == 'diplo_source'",
-                ns = ns,
-                fluidRow(
-                  column(5,
-                         shiny::selectInput(
-                           inputId = ns("diplo_database"),
-                           label = "Bases de la Diplomatura",
-                           choices = c("01 - SEMANA01_BASE01_PESOS"  = "SEMANA01_BASE01_PESOS",
-                                       "02 - SEMANA01_BASE02_ALTURA" = "SEMANA01_BASE02_ALTURA")
-                         )
-                  )
-                )
-              )
-              ),
-              shiny::conditionalPanel(
-                condition = "input.data_source == 'r_source'",
-                ns = ns,
-                fluidRow(
-                  column(3,
-                         shiny::selectInput(
-                           inputId = ns("r_database"),
-                           label = "Bases de R",
-                           choices = c("01 - mtcars" = "mtcars", "02 - iris" = "iris")
-                         )
-                  )
-                )
-              )
-              ),
+                       )
+                   ),
+                   shiny::conditionalPanel(
+                     condition = "input.data_source == 'r_source'",
+                     ns = ns,
+                     fluidRow(
+                       column(3,
+                              shiny::selectInput(
+                                inputId = ns("r_database"),
+                                label = "Bases de R",
+                                choices = c("01 - mtcars" = "mtcars", "02 - iris" = "iris")
+                              )
+                       )
+                     )
+                   )
+            ),
             column(3, actionButton(ns("action_load"),
                                    label = "LOAD"),
-)
-            ),
+            )
+          ),
           shinycssloaders::withSpinner(DT::DTOutput(ns("table_database"))),
 
         )
@@ -1077,27 +1077,27 @@ module_diplo_001_clase01_serverB <- function(id){
         ns <- shiny::NS(id)
 
         div(shinyjs::useShinyjs(), id = ns("render_files"),
-        shinydashboard::box(
-          title = "03 - Control de Misión",
-          status = "primary",
-          id = ns("my_box03"),
-          solidHeader = TRUE,
-          collapsible = TRUE,
-          collapsed = FALSE,
-          closable = FALSE,
-          width = 12,
-          div(
-            #h2("Generacion de Reportes"), br(),
-            #h3("- Base de datos - OK!"),
-            #h3("- Variable cuantitativa seleccionada - OK!"),
-            #h3("- Reporte y script - OK!"),
-            actionButton(ns("render_report_button"), "Render Report", width = "100%"),
-            downloadButton(outputId = ns('download_button_pdf'),  label = "Download PDF", width = "100%", disabled = TRUE),
-            downloadButton(outputId = ns('download_button_html'), label = "Download HTML", width = "100%", disabled = TRUE),
-            downloadButton(outputId = ns('download_button_word'), label = "Download WORD", width = "100%", disabled = TRUE),
-            downloadButton(outputId = ns('download_button_zip'),  label = "Download All (ZIP)", width = "100%", disabled = TRUE)
-          )
-        )
+            shinydashboard::box(
+              title = "03 - Control de Misión",
+              status = "primary",
+              id = ns("my_box03"),
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed = FALSE,
+              closable = FALSE,
+              width = 12,
+              div(
+                #h2("Generacion de Reportes"), br(),
+                #h3("- Base de datos - OK!"),
+                #h3("- Variable cuantitativa seleccionada - OK!"),
+                #h3("- Reporte y script - OK!"),
+                actionButton(ns("render_report_button"), "Render Report", width = "100%"),
+                downloadButton(outputId = ns('download_button_pdf'),  label = "Download PDF", width = "100%", disabled = TRUE),
+                downloadButton(outputId = ns('download_button_html'), label = "Download HTML", width = "100%", disabled = TRUE),
+                downloadButton(outputId = ns('download_button_word'), label = "Download WORD", width = "100%", disabled = TRUE),
+                downloadButton(outputId = ns('download_button_zip'),  label = "Download All (ZIP)", width = "100%", disabled = TRUE)
+              )
+            )
         )
       })
 

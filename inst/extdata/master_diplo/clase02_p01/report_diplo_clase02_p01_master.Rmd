@@ -1,0 +1,158 @@
+---
+title: "Diplo - Semana 02 - Parte 01 - Medidas Resumen"
+author: "David Elias Panigo"
+date: "24-05-2024"
+output:
+  html_document:
+    df_print: paged
+---
+<br>
+<br>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var title = document.querySelector('h1.title');
+  var author = document.querySelector('.author');
+  var date = document.querySelector('.date');
+  
+  title.style.display = 'none';
+  author.style.display = 'none';
+  date.style.display = 'none';
+});
+</script>
+
+<div class="image-container">
+  <img src="logo_01_unc.png"      class="inline-image" width="200"  height="100">
+  <img src="logo_02_fcefyn.png"   class="inline-image" width="200"  height="100">
+  <img src="logo_03_efadoc.png"   class="inline-image" width="200"  height="100">
+  <img src="logo_04_rscience.png" class="inline-image" width="200"  height="100">
+</div>
+
+## Diplomatura en Bioestadística básica aplicada mediada con R
+
+#### Hora de ejecución: `r the_time`
+#### Sistema operativo: `r Sys.info()["sysname"]`
+#### Versión de R: `r R.version.string`
+#### Versión de RStudio: `r RStudio.Version()$version`
+#### Versión de Rscience.Diplo: `r packageVersion("Rscience.Diplo")`
+
+<br>
+<br>
+
+## Clase 02 - Parte 01 - Medidas de Posición y Dispersión
+
+```{r,  include =FALSE}
+knitr::opts_chunk$set(echo=TRUE, comment=NA)
+# BASE <- mtcars
+#selected_var_pos <- _selected_pos_var_ 
+#selected_var_name <- colnames(BASE)[selected_var_pos]
+#selected_var_pos <- 1
+```
+
+
+```{r, include =T, eval = F, class.source="bg-success"}
+################################################
+##### INICIO SCRIPT SEMANA 2 - Capitulo 1
+##### Medidas de posición y dispersión en R
+################################################
+```
+
+<br>
+<br>
+
+```{r, include = data_source == "csv_source", eval = F, class.source="bg-success"}
+# Nombre y extension de mi archivo csv
+MI_ARCHIVO <- .user_file
+
+# Cargamos la Base de Datos
+BASE <- read.csv(file = MI_ARCHIVO,
+                header = .user_header,
+                sep = .user_sep,
+                dec = .user_dec)
+
+# Visualizamos la base de datos
+head(x = BASE, n = 5)
+```
+
+```{r, include = data_source == "r_source", eval = F, class.source="bg-success"}
+# Seleccionamos una base de datos de R
+BASE <- .r_name_database
+
+# Solo se visualizan las primeras 10 filas
+head(x = BASE, n = 5)
+```
+
+```{r, include = data_source == "diplo_source", eval = F, class.source="bg-success"}
+# Seleccionamos una base de datos de la Diplomatura
+BASE <- .diplo_name_database
+
+# Solo se visualizan las primeras 10 filas
+head(x = BASE, n = 5)
+```
+
+```{r, echo= F, eval = T, class.source="bg-success"}
+head(x = BASE, n = 5)
+```
+
+
+```{r, include =T, eval =T, class.source="bg-success"}
+# Aislamos una variable en particular de la base de datos.
+VR <- BASE[,selected_var_pos]
+VR
+```
+<br>
+<br>
+
+```{r, include =T, eval = T, class.source="bg-success"}
+# Valor Mínimo de VR
+min(VR) 
+```
+<br>
+<br>
+
+```{r, include =T, eval = T,class.source="bg-success"}
+# Valor Máximo de VR
+max(VR)
+```
+<br>
+<br>
+
+```{r, include =T, eval = T,class.source="bg-success"}
+# Cantidad de Datos del objeto VR
+length(VR)
+```
+<br>
+<br>
+
+```{r, include =T, eval = T, class.source="bg-success"}
+# Varias medidas de VR con una sola función
+summary(VR)
+```
+<br>
+<br>
+
+```{r, include =T, eval = T, class.source="bg-success"}
+# Varianza Muestral de VR
+var(VR)
+```
+<br>
+<br>
+
+```{r, include =T, eval = T, class.source="bg-success"}
+# Desvio Standard Muestral de VR
+sd(VR)
+```
+<br>
+<br>
+
+```{r, include =T, eval = F, class.source="bg-success"}
+################################################
+##### FIN SCRIPT SEMANA 2 - Capitulo 1
+##### Medidas de posicion y dispersion en R
+################################################
+```
+
+<br>
+<br>
+
+
+

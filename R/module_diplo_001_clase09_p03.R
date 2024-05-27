@@ -2,7 +2,7 @@
 
 
 # # # 01) UI - Selection for 'database'
-module_diplo_001_clase01_ui <- function(id){
+module_diplo_001_clase09_p03_ui <- function(id){
   ns <- shiny::NS(id)
 
   the_package_name <- "Rscience.Diplo"
@@ -38,10 +38,10 @@ module_diplo_001_clase01_ui <- function(id){
       "))
     ),
     includeCSS(system.file("www/style.css", package = "Rscience.Diplo")),
-#    includeCSS("inst/www/style.css"),
+    #    includeCSS("inst/www/style.css"),
     shinyjs::useShinyjs(),
     id = ns("input-panel"),
-    shiny::h1("Clase 01 - Medidas Resumen para 1 Variable Cuantitativa"),
+    shiny::h1("Clase 09 - Parte 03 - Friedman"),
     shiny::fluidRow(
       shiny::column(12,
 
@@ -49,10 +49,13 @@ module_diplo_001_clase01_ui <- function(id){
                     shiny::br(),
                     shiny::br(),
 
-                    shiny::fluidRow(
-                      shiny::column(4, uiOutput(ns("box02_var_selector"))),
-                      shiny::column(8, uiOutput(ns("box03_control_de_mision")))
-                    ),
+                    uiOutput(ns("box02_var_selector")),
+                    shiny::br(),
+                    shiny::br(),
+
+                    uiOutput(ns("box03_control_de_mision")),
+                    shiny::br(),
+                    shiny::br(),
 
 
                     shiny::textOutput(ns("text_control_general")),
@@ -76,7 +79,7 @@ module_diplo_001_clase01_ui <- function(id){
 
 
 
-module_diplo_001_clase01_server <- function(id){
+module_diplo_001_clase09_p03_server <- function(id){
 
   moduleServer(
     id,
@@ -137,26 +140,26 @@ module_diplo_001_clase01_server <- function(id){
           )
         } else
 
-         # Si el archivo es una base de R...
-            if(input$"data_source" == "diplo_source"){
+          # Si el archivo es una base de R...
+          if(input$"data_source" == "diplo_source"){
 
-              req(input$diplo_database)
+            req(input$diplo_database)
+
+            validate(
+              need(exists(input$diplo_database), 'Error 002: La base seleccionada de la Diplomatura no se encuentra en el entorno de R.\n'),
+              errorClass = "ERROR"
+            )
+          } else
+            # Si el archivo es una base de R...
+            if(input$"data_source" == "r_source"){
+
+              req(input$r_database)
 
               validate(
-                need(exists(input$diplo_database), 'Error 002: La base seleccionada de la Diplomatura no se encuentra en el entorno de R.\n'),
+                need(exists(input$r_database), 'Error 002: La base de R seleccionada no se encuentra en el entorno de R.\n'),
                 errorClass = "ERROR"
               )
-            } else
-              # Si el archivo es una base de R...
-              if(input$"data_source" == "r_source"){
-
-                req(input$r_database)
-
-                validate(
-                  need(exists(input$r_database), 'Error 002: La base de R seleccionada no se encuentra en el entorno de R.\n'),
-                  errorClass = "ERROR"
-                )
-              }
+            }
 
 
         shinyjs::enable("action_load")
@@ -271,27 +274,27 @@ module_diplo_001_clase01_server <- function(id){
         if(input$data_source == "csv_source"){
 
           database(utils::read.csv(file = input$csv_file_path$datapath,
-                              header = as.logical(as.character(input$csv_header)),
-                              sep = input$csv_sep,
-                              dec = input$csv_dec,
-                              stringsAsFactors = FALSE)
-            )
+                                   header = as.logical(as.character(input$csv_header)),
+                                   sep = input$csv_sep,
+                                   dec = input$csv_dec,
+                                   stringsAsFactors = FALSE)
+          )
 
 
-          } else
+        } else
 
           if(input$data_source == "diplo_source"){
 
-              database(base::eval(base::parse(text = input$"diplo_database")))
-            } else
+            database(base::eval(base::parse(text = input$"diplo_database")))
+          } else
 
             if(input$data_source == "r_source"){
 
-                database(base::eval(base::parse(text = input$"r_database")))
+              database(base::eval(base::parse(text = input$"r_database")))
             }
 
 
-        })
+      })
 
 
 
@@ -329,7 +332,7 @@ module_diplo_001_clase01_server <- function(id){
       output$table_database <- DT::renderDT({
 
 
-       req(control_03())
+        req(control_03())
 
         # Usar lapply para mostrar los elementos deseados
 
@@ -376,10 +379,11 @@ module_diplo_001_clase01_server <- function(id){
 
 
       #--- 3)  Seleccion de una variable
-      #--- 3.1) Crear input$selected_var_name
+      #--- 3.1) Crear input$selected_vr_name
       render_button_status  <- shiny::reactiveVal()
       render_button_counter <- shiny::reactiveVal()
       vector_var_names  <- shiny::reactiveVal()
+
       shiny::observe({
         # Control hasta inputFile + database()
 
@@ -390,7 +394,7 @@ module_diplo_001_clase01_server <- function(id){
         vector_var_names(base::colnames(database()))
 
         # Seleccion de una variable cuantitati a
-        output$var_selector <- shiny::renderUI({
+        output$var_selector01 <- shiny::renderUI({
 
 
 
@@ -418,20 +422,83 @@ module_diplo_001_clase01_server <- function(id){
           vector_options <- c("Selecciona una..." = "", vector_options)
 
           div(
-            shiny::selectInput(inputId = ns("selected_var_name"), label = "Selecciona una variable cuantitativa...",
+            shiny::selectInput(inputId = ns("selected_vr_name"), label = "Variable Respuesta (VR)",
                                choices = vector_options,
                                selected = vector_options[1])
           )
 
         })
 
+        output$var_selector02 <- shiny::renderUI({
+
+
+
+          ns <- shiny::NS(id)
+
+          req(database(), vector_var_names())
+
+          vector_pos <- 1:ncol(database())
+          vector_letters <- openxlsx::int2col(vector_pos)
+          vector_colnames <- colnames(database())
+
+
+          # Determinar la cantidad máxima de dígitos
+          max_digits <- max(nchar(vector_pos))
+          max_digits <- max(max_digits, 2)
+          vector_order <- sprintf(paste0("%0", max_digits, "d"), vector_pos)
+          vector_numeric <- sapply(database(), is.numeric)
+
+          # Para el usuario
+          vector_names <- paste0(vector_order, " - ", vector_letters, " - ", vector_colnames)
+
+          # Vector de opcion interno (nombre de columnas)
+          vector_options <- vector_colnames
+          names(vector_options) <- vector_names
+          vector_options <- c("Selecciona una..." = "", vector_options)
+
+          div(
+            shiny::selectInput(inputId = ns("selected_factor_name"), label = "Factor",
+                               choices = vector_options,
+                               selected = vector_options[1])
+          )
+
+        })
+
+        output$var_selector03 <- shiny::renderUI({
+
+
+
+          ns <- shiny::NS(id)
+
+          req(database(), vector_var_names())
+
+          vector_choices <- c("0.10   (10%)" = "0.10",
+                              "0.05    (5%)"  = "0.05",
+                              "0.01    (1%)"  = "0.01")
+
+          div(
+            shiny::selectInput(inputId = ns("alpha_value"), label = "Valor alfa",
+                               choices = vector_choices,
+                               selected = vector_choices[2])
+          )
+
+        })
 
       })
 
+      # Para VR
+      selected_vr_name    <- shiny::reactiveVal()
+      selected_vr_pos     <- shiny::reactiveVal()
+      selected_vr_letter  <- shiny::reactiveVal()
 
-      selected_var_name    <- shiny::reactiveVal()
-      selected_var_pos     <- shiny::reactiveVal()
-      selected_var_letter  <- shiny::reactiveVal()
+      # Para FACTOR
+      selected_factor_name    <- shiny::reactiveVal()
+      selected_factor_pos     <- shiny::reactiveVal()
+      selected_factor_letter  <- shiny::reactiveVal()
+
+      # Para alfa
+      selected_alpha_value <- shiny::reactiveVal()
+
       control_04 <- reactive({
 
         render_button_status(FALSE)
@@ -440,59 +507,97 @@ module_diplo_001_clase01_server <- function(id){
         runjs(sprintf('$("#%s").css({"background-color": "orange", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("render_report_button")))
 
 
-        # # # Control sobre input$selected_var_name
-        req(control_03(), input$selected_var_name)
+        # # # Control sobre input$selected_vr_name
+        req(control_03(), input$selected_vr_name, input$selected_factor_name,
+            input$alpha_value)
+
 
         validate(
-          need(!is.null(input$selected_var_name),   'Error 006: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+          need(!is.null(input$selected_vr_name),   'Error 006: Problemas con la variable VR seleccionada. Vuelva a cargar el archivo.'),
+          need(!is.null(input$selected_factor_name),   'Error 006: Problemas con la variable FACTOR seleccionada. Vuelva a cargar el archivo.'),
+          need(!is.null(input$alpha_value),   'Error 006: Problemas con el valor de alfa seleccionado. Vuelva a cargar el archivo.'),
           errorClass = "ERROR"
         )
 
 
         validate(
-          need(input$selected_var_name != "", 'Seleccione una variable cuantitativa de su base de datos.'),
+          need(input$selected_vr_name != "", 'Seleccione una VR de su base de datos.'),
+          need(input$selected_factor_name != "", 'Seleccione un FACTOR de su base de datos.'),
+          need(input$alpha_value != "", 'Seleccione un valor de alpha.'),
           errorClass = "AVISO"
         )
 
-        selected_var_name(input$selected_var_name)
-        selected_var_pos(match(selected_var_name(), vector_var_names()))
-        selected_var_letter(openxlsx::int2col(selected_var_pos()))
+        # Para VR
+        selected_vr_name(input$selected_vr_name)
+        selected_vr_pos(match(selected_vr_name(), vector_var_names()))
+        selected_vr_letter(openxlsx::int2col(selected_vr_pos()))
+
+
+        # Para FACTOR
+        selected_factor_name(input$selected_factor_name)
+        selected_factor_pos(match(selected_factor_name(), vector_var_names()))
+        selected_factor_letter(openxlsx::int2col(selected_factor_pos()))
+
+        # Para Alfa
+        selected_alpha_value(as.numeric(as.character(input$alpha_value)))
 
         validate(
-          need(!is.null(selected_var_name()),   'Error 007: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
-          need(!is.null(selected_var_pos()),    'Error 008: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
-          need(!is.null(selected_var_letter()), 'Error 009: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+          need(!is.null(selected_vr_name()),   'Error 007: Problemas con la VR seleccionada. Vuelva a cargar el archivo.'),
+          need(!is.null(selected_vr_pos()),    'Error 008: Problemas con la VR seleccionada. Vuelva a cargar el archivo.'),
+          need(!is.null(selected_vr_letter()), 'Error 009: Problemas con la VR seleccionada. Vuelva a cargar el archivo.'),
           errorClass = "ERROR"
         )
 
-
-
         validate(
-          need(sum(colnames(database()) == selected_var_name()) == 1, 'Error 010: El nombre de variable seleccionado no pertenece a la base.'),
+          need(!is.null(selected_factor_name()),   'Error 007: Problemas con el FACTOR seleccionado. Vuelva a cargar el archivo.'),
+          need(!is.null(selected_factor_pos()),    'Error 008: Problemas con el FACTOR seleccionado. Vuelva a cargar el archivo.'),
+          need(!is.null(selected_factor_letter()), 'Error 009: Problemas con el FACTOR seleccionado. Vuelva a cargar el archivo.'),
           errorClass = "ERROR"
         )
 
         validate(
-          need(ncol(database()) >= selected_var_pos(), 'Error 011: La posición de variable no pertenece a la base de datos.'),
-          errorClass = "ERROR"
+          need(!is.null(selected_alpha_value()),   'Error 007: Problemas con el valor de alfa seleccionado. Vuelva a cargar el archivo.'),
         )
 
 
-        vector_vr <- database()[,selected_var_pos()]
+        validate(
+          need(sum(colnames(database()) == selected_vr_name()) == 1, 'Error 010: El nombre de variable seleccionado no pertenece a la base.'),
+          need(sum(colnames(database()) == selected_factor_name()) == 1, 'Error 010: El nombre de variable seleccionado no pertenece a la base.'),
+          need(selected_vr_name() != selected_factor_name(), 'Error 010: Las variables VR y FACTOR deben ser diferentes.'),
+          errorClass = "ERROR"
+        )
 
         validate(
-          need((sum(is.na(vector_vr))==0), 'Error 014: La columna seleccionada posee al menos una celda sin datos. \n
-              Usted, ¿está trabajando con una base de datos que no corresponde a la Diplomatura?.
+          need(ncol(database()) >= selected_vr_pos(), 'Error 011: La posición de variable VR no pertenece a la base de datos.'),
+          need(ncol(database()) >= selected_factor_pos(), 'Error 011: La posición de variable FACTOR no pertenece a la base de datos.'),
+          errorClass = "ERROR"
+        )
+
+        ##### SOLO ALFA ##############################
+        validate(
+          need(is.numeric(selected_alpha_value()), 'Error 014: Problemas internos con el valor de alfa elegido.
+               El valor alfa internamente debe ser numérico.'),
+          errorClass = "ERROR"
+        )
+
+        ##### SOLO VR ##############################
+        vector_vr <- database()[,selected_vr_pos()]
+
+
+        validate(
+          need((sum(is.na(vector_vr))==0), 'Error 014: La variable VR seleccionada posee al menos una celda sin datos. \n
+              Usted, ¿está trabajando con una base de datos que corresponde a la Diplomatura?.
               La diplomatura es una iniciación a R por lo que solo veremos código de R aplicable a bases de datos sin celdas vacías.'),
           errorClass = "ERROR"
         )
 
+
         validate(
           need((is.numeric(vector_vr)), 'Error 015:
-          Las medidas resumen solo son aplicables a variables numéricas.
+          La variable respuesta (VR) debe ser numérica para poder realizar el análisis.
           La variable seleccionada no es numérica.
           Verifique las siguientes opciones:\n
-               1) Se equivocó al seleccionar variable con la cual trabajar. Elija la variable cuantitativa correcta.\n
+               1) Se equivocó al seleccionar variable VR con la cual trabajar. Elija la variable cuantitativa correcta.\n
                2) No abrió el archivo csv como archivo de texto en su computadora para tomar noción sobre
                si el archivo tiene como primera fila al nombre de columnas, cual es el separador de columna
                y del separador decimal.\n
@@ -504,11 +609,72 @@ module_diplo_001_clase01_server <- function(id){
         )
 
         validate(
-          need((length(vector_vr)>=1), 'Error 015: La columna seleccionada no posee datos. \n
+          need((length(vector_vr)>=1), 'Error 015: La variable VR no posee datos. \n
               Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
           errorClass = "ERROR"
         )
 
+        validate(
+          need((var(vector_vr)!=0), 'Error 015: La variable seleccionada tiene varianza cero. \n
+              Eso imposibilita realizar el análisis de Anova.
+               Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
+          errorClass = "ERROR"
+        )
+
+
+        ##### SOLO FACTOR ##############################
+        vector_factor <- database()[,selected_factor_pos()]
+
+        validate(
+          need((sum(is.na(vector_factor))==0), 'Error 014: La variable FACTOR seleccionada posee al menos una celda sin datos. \n
+              Usted, ¿está trabajando con una base de datos que corresponde a la Diplomatura?.
+              La diplomatura es una iniciación a R por lo que solo veremos código de R aplicable a bases de datos sin celdas vacías.'),
+          errorClass = "ERROR"
+        )
+
+        validate(
+          need((length(vector_factor)>=1), 'Error 015: La variable FACTOR seleccionada no posee datos. \n
+              Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
+          errorClass = "ERROR"
+        )
+
+
+        vector_n <- tapply(vector_vr, vector_factor, length)
+        validate(
+          need((length(vector_n)>=2), 'Error 015: Para realizar el test de ANOVA la variable FACTOR debe tener al menos 2 niveles. \n
+              Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
+          errorClass = "ERROR"
+        )
+
+
+        check_reps_lvl <- sum(vector_n >= 2) == length(vector_n)
+        validate(
+          need(check_reps_lvl, 'Error 015: Para realizar el test de ANOVA la variable FACTOR debe tener al menos 2 repeticiones en cada nivel del FACTOR. \n
+              Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
+          errorClass = "ERROR"
+        )
+
+        vector_var <- tapply(vector_vr, vector_factor, var)
+        validate(
+          need(sum(is.null(vector_var)) == 0, 'Error 015:
+          Para realizar el test de ANOVA debe ser posible calcular la varianza de cada nivel del factor.\n
+              Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
+          errorClass = "ERROR"
+        )
+
+        validate(
+          need(sum(is.na(vector_var)) == 0, 'Error 015:
+          Para realizar el test de ANOVA debe ser posible calcular la varianza de cada nivel del factor.\n
+              Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
+          errorClass = "ERROR"
+        )
+
+        validate(
+          need(sum(vector_var == 0) == 0, 'Error 015:
+          Para realizar el test de ANOVA debe ser posible calcular la varianza de cada nivel del factor.\n
+              Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
+          errorClass = "ERROR"
+        )
         # Como todo esta OK, se habilita el boton de render.
         shinyjs::enable("render_report_button")
         render_button_status(TRUE)
@@ -612,13 +778,13 @@ module_diplo_001_clase01_server <- function(id){
 
         # # # Special folder
         the_package_name <- "Rscience.Diplo"
-        special_folder_package <- file.path("extdata", "master_diplo", "clase01")
-        special_folder_local <- file.path("inst", "extdata", "master_diplo", "clase01")
+        special_folder_package <- file.path("extdata", "master_diplo", "clase09_p03")
+        special_folder_local <- file.path("inst", "extdata", "master_diplo", "clase09_p03")
 
         # # # ---- Input objects ---- # # #
         input_old_str <- "_master"
         input_new_str <- "_mod"
-        input_file_rmd   <- 'report_diplo_clase01_master.Rmd'
+        input_file_rmd   <- 'report_diplo_clase09_p03_master.Rmd'
         input_file_css   <- "styles.css"
         input_file_png01 <- "logo_01_unc.png"
         input_file_png02 <- "logo_02_fcefyn.png"
@@ -718,7 +884,8 @@ module_diplo_001_clase01_server <- function(id){
         # Estos elementos seran suplantados sobre la copia
         # del archivo .Rmd que esta en la carpeta temporal
         replacement_list <- list()
-        replacement_list$"selected_var_pos" <- selected_var_pos()
+        replacement_list$"selected_vr_pos" <- selected_vr_pos()
+        replacement_list$"selected_factor_pos" <- selected_factor_pos()
         replacement_list$".user_file" <- paste0("\"", input$csv_file_path$name, "\"")
         replacement_list$".user_header" <- as.logical(as.character(input$csv_header))
         replacement_list$".user_sep" <- paste0("\"", input$csv_sep, "\"")
@@ -849,7 +1016,7 @@ module_diplo_001_clase01_server <- function(id){
 
 
 
-      observeEvent(input$selected_var_name, {
+      observeEvent(input$selected_vr_name, {
 
         render_button_counter(0)
         download_counter_pdf(0)
@@ -940,7 +1107,7 @@ module_diplo_001_clase01_server <- function(id){
 }
 
 
-module_diplo_001_clase01_serverB <- function(id){
+module_diplo_001_clase09_p03_serverB <- function(id){
 
   moduleServer(
     id,
@@ -971,83 +1138,83 @@ module_diplo_001_clase01_serverB <- function(id){
                    )
             ),
             column(7,
-             div(shinyjs::useShinyjs(), id = ns("input-var-02-A"),
-              shiny::conditionalPanel(
-                condition = "input.data_source == 'csv_source'",
-                ns = ns,
-                fluidRow(
-                  column(4,
-                         fileInput(
-                           inputId = ns("csv_file_path"),
-                           label = "Elija un archivo CSV",
-                           accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
-                           #accept = "*/*"
+                   div(shinyjs::useShinyjs(), id = ns("input-var-02-A"),
+                       shiny::conditionalPanel(
+                         condition = "input.data_source == 'csv_source'",
+                         ns = ns,
+                         fluidRow(
+                           column(4,
+                                  fileInput(
+                                    inputId = ns("csv_file_path"),
+                                    label = "Elija un archivo CSV",
+                                    accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
+                                    #accept = "*/*"
+                                  )
+                           )
+                         ),
+                         fluidRow(
+                           column(1, radioButtons(
+                             inputId = ns("csv_header"),
+                             label = "header",
+                             choices = c("TRUE" = TRUE, "FALSE" = FALSE),
+                             selected = TRUE
+                           )),
+                           column(3, radioButtons(
+                             inputId = ns("csv_sep"),
+                             label = "Separador de columnas",
+                             choices = c("semicolon (;)" = ";", "comma (,)" = ","),
+                             selected = ";"
+                           )),
+                           column(2, radioButtons(
+                             inputId = ns("csv_dec"),
+                             label = "Decimal",
+                             choices = c("Period (.)" = ".", "Comma (,)" = ","),
+                             selected = "."
+                           )),
+                           column(3, radioButtons(
+                             inputId = ns("csv_quote"),
+                             label = "Comillas",
+                             choices = c("Double quotes (\")" = "\"", "Simple quotes (')" = "'"),
+                             selected = "\""
+                           ))
+                         )#,
+                         #tags$hr()
+                       )
+                   ),
+                   div(shinyjs::useShinyjs(), id = ns("input-var-02-B"),
+                       shiny::conditionalPanel(
+                         condition = "input.data_source == 'diplo_source'",
+                         ns = ns,
+                         fluidRow(
+                           column(5,
+                                  shiny::selectInput(
+                                    inputId = ns("diplo_database"),
+                                    label = "Bases de la Diplomatura",
+                                    choices = c("01 - SEMANA01_BASE01_PESOS"  = "SEMANA01_BASE01_PESOS",
+                                                "02 - SEMANA01_BASE02_ALTURA" = "SEMANA01_BASE02_ALTURA")
+                                  )
+                           )
                          )
-                  )
-                ),
-                fluidRow(
-                  column(1, radioButtons(
-                    inputId = ns("csv_header"),
-                    label = "header",
-                    choices = c("TRUE" = TRUE, "FALSE" = FALSE),
-                    selected = TRUE
-                  )),
-                  column(3, radioButtons(
-                    inputId = ns("csv_sep"),
-                    label = "Separador de columnas",
-                    choices = c("semicolon (;)" = ";", "comma (,)" = ","),
-                    selected = ";"
-                  )),
-                  column(2, radioButtons(
-                    inputId = ns("csv_dec"),
-                    label = "Decimal",
-                    choices = c("Period (.)" = ".", "Comma (,)" = ","),
-                    selected = "."
-                  )),
-                  column(3, radioButtons(
-                    inputId = ns("csv_quote"),
-                    label = "Comillas",
-                    choices = c("Double quotes (\")" = "\"", "Simple quotes (')" = "'"),
-                    selected = "\""
-                  ))
-                )#,
-                #tags$hr()
-              )
-              ),
-              div(shinyjs::useShinyjs(), id = ns("input-var-02-B"),
-              shiny::conditionalPanel(
-                condition = "input.data_source == 'diplo_source'",
-                ns = ns,
-                fluidRow(
-                  column(5,
-                         shiny::selectInput(
-                           inputId = ns("diplo_database"),
-                           label = "Bases de la Diplomatura",
-                           choices = c("01 - SEMANA01_BASE01_PESOS"  = "SEMANA01_BASE01_PESOS",
-                                       "02 - SEMANA01_BASE02_ALTURA" = "SEMANA01_BASE02_ALTURA")
-                         )
-                  )
-                )
-              )
-              ),
-              shiny::conditionalPanel(
-                condition = "input.data_source == 'r_source'",
-                ns = ns,
-                fluidRow(
-                  column(3,
-                         shiny::selectInput(
-                           inputId = ns("r_database"),
-                           label = "Bases de R",
-                           choices = c("01 - mtcars" = "mtcars", "02 - iris" = "iris")
-                         )
-                  )
-                )
-              )
-              ),
+                       )
+                   ),
+                   shiny::conditionalPanel(
+                     condition = "input.data_source == 'r_source'",
+                     ns = ns,
+                     fluidRow(
+                       column(3,
+                              shiny::selectInput(
+                                inputId = ns("r_database"),
+                                label = "Bases de R",
+                                choices = c("01 - mtcars" = "mtcars", "02 - iris" = "iris")
+                              )
+                       )
+                     )
+                   )
+            ),
             column(3, actionButton(ns("action_load"),
                                    label = "LOAD"),
-)
-            ),
+            )
+          ),
           shinycssloaders::withSpinner(DT::DTOutput(ns("table_database"))),
 
         )
@@ -1066,8 +1233,11 @@ module_diplo_001_clase01_serverB <- function(id){
           collapsed = FALSE,
           closable = FALSE,
           width = 12,
-          shiny::uiOutput(ns("var_selector"))
-
+          fluidRow(
+            column(4, shiny::uiOutput(ns("var_selector01"))),
+            column(4, shiny::uiOutput(ns("var_selector02"))),
+            column(4, shiny::uiOutput(ns("var_selector03")))
+          )
         )
       })
 
@@ -1077,27 +1247,27 @@ module_diplo_001_clase01_serverB <- function(id){
         ns <- shiny::NS(id)
 
         div(shinyjs::useShinyjs(), id = ns("render_files"),
-        shinydashboard::box(
-          title = "03 - Control de Misión",
-          status = "primary",
-          id = ns("my_box03"),
-          solidHeader = TRUE,
-          collapsible = TRUE,
-          collapsed = FALSE,
-          closable = FALSE,
-          width = 12,
-          div(
-            #h2("Generacion de Reportes"), br(),
-            #h3("- Base de datos - OK!"),
-            #h3("- Variable cuantitativa seleccionada - OK!"),
-            #h3("- Reporte y script - OK!"),
-            actionButton(ns("render_report_button"), "Render Report", width = "100%"),
-            downloadButton(outputId = ns('download_button_pdf'),  label = "Download PDF", width = "100%", disabled = TRUE),
-            downloadButton(outputId = ns('download_button_html'), label = "Download HTML", width = "100%", disabled = TRUE),
-            downloadButton(outputId = ns('download_button_word'), label = "Download WORD", width = "100%", disabled = TRUE),
-            downloadButton(outputId = ns('download_button_zip'),  label = "Download All (ZIP)", width = "100%", disabled = TRUE)
-          )
-        )
+            shinydashboard::box(
+              title = "03 - Control de Misión",
+              status = "primary",
+              id = ns("my_box03"),
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed = FALSE,
+              closable = FALSE,
+              width = 12,
+              div(
+                #h2("Generacion de Reportes"), br(),
+                #h3("- Base de datos - OK!"),
+                #h3("- Variable cuantitativa seleccionada - OK!"),
+                #h3("- Reporte y script - OK!"),
+                actionButton(ns("render_report_button"), "Render Report", width = "100%"),
+                downloadButton(outputId = ns('download_button_pdf'),  label = "Download PDF", width = "100%", disabled = TRUE),
+                downloadButton(outputId = ns('download_button_html'), label = "Download HTML", width = "100%", disabled = TRUE),
+                downloadButton(outputId = ns('download_button_word'), label = "Download WORD", width = "100%", disabled = TRUE),
+                downloadButton(outputId = ns('download_button_zip'),  label = "Download All (ZIP)", width = "100%", disabled = TRUE)
+              )
+            )
         )
       })
 
