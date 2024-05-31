@@ -47,20 +47,26 @@ module_diplo_001_clase09_p02_ui <- function(id){
 
                     uiOutput(ns("box01_database")),
                     shiny::br(),
-                    shiny::br(),
+                    shiny::br()
+      )
+    ),
 
-                    uiOutput(ns("box02_var_selector")),
-                    shiny::br(),
-                    shiny::br(),
+    shiny::fluidRow(
+      shiny::column(6,
+                    uiOutput(ns("box02_var_selector"))),
 
-                    uiOutput(ns("box03_control_de_mision")),
-                    shiny::br(),
-                    shiny::br(),
+      shiny::column(6,
+                    uiOutput(ns("box03_control_de_mision")))
+    ),
+    shiny::br(),
+    shiny::br(),
 
+    shiny::fluidRow(
+      shiny::column(12,
+                    shiny::textOutput(ns("text_control_general")))),
 
-                    shiny::textOutput(ns("text_control_general")),
-
-
+    shiny::fluidRow(
+      shiny::column(12,
                     uiOutput(ns("box04_report")),
                     br(), br(), br()
       )
@@ -776,15 +782,18 @@ module_diplo_001_clase09_p02_server <- function(id){
         execution_time <- gsub("[[:punct:]]", "_", original_time)
         execution_time <- gsub(" ", "_", execution_time)
 
+        # Selected class
+        selected_class_part <- "clase09_p02"
+
         # # # Special folder
         the_package_name <- "Rscience.Diplo"
-        special_folder_package <- file.path("extdata", "master_diplo", "clase09_p02")
-        special_folder_local <- file.path("inst", "extdata", "master_diplo", "clase09_p02")
+        special_folder_package <- file.path("extdata", "master_diplo", selected_class_part)
+        special_folder_local <- file.path("inst", special_folder_package)
 
         # # # ---- Input objects ---- # # #
         input_old_str <- "_master"
         input_new_str <- "_mod"
-        input_file_rmd   <- 'report_diplo_clase09_p02_master.Rmd'
+        input_file_rmd   <- paste0("report_diplo_", selected_class_part, "_master.Rmd")
         input_file_css   <- "styles.css"
         input_file_png01 <- "logo_01_unc.png"
         input_file_png02 <- "logo_02_fcefyn.png"
@@ -1000,11 +1009,11 @@ module_diplo_001_clase09_p02_server <- function(id){
         shinyjs::enable("download_button_word")
         shinyjs::enable("download_button_zip")
 
-        # # # Y los dejamos en verde...
-        if(download_counter_pdf()  >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_pdf")))
-        if(download_counter_html() >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_html")))
-        if(download_counter_word() >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_word")))
-        if(download_counter_zip()  >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_zip")))
+        # # # # Y los dejamos en verde...
+        # if(download_counter_pdf()  >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_pdf")))
+        # if(download_counter_html() >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_html")))
+        # if(download_counter_word() >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_word")))
+        # if(download_counter_zip()  >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_zip")))
 
 
         return(TRUE)
@@ -1025,6 +1034,85 @@ module_diplo_001_clase09_p02_server <- function(id){
         download_counter_zip(0)
       })
 
+
+      observeEvent(input$selected_factor_name, {
+
+        render_button_counter(0)
+        download_counter_pdf(0)
+        download_counter_html(0)
+        download_counter_word(0)
+        download_counter_zip(0)
+      })
+
+
+      observeEvent(download_counter_pdf(), {
+
+
+        req(control_06())
+        if(download_counter_pdf() >= 1){
+          runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_pdf")))
+
+        } else
+
+          if(download_counter_pdf() == 0){
+            runjs(sprintf('$("#%s").css({"background-color": "orange", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_pdf")))
+          }
+
+
+      })
+
+
+      observeEvent(download_counter_html(), {
+
+
+        req(control_06())
+        if(download_counter_html() >= 1){
+          runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_html")))
+
+        } else
+
+          if(download_counter_html() == 0){
+            runjs(sprintf('$("#%s").css({"background-color": "orange", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_html")))
+          }
+
+
+      })
+
+
+      observeEvent(download_counter_word(), {
+
+
+        req(control_06())
+        if(download_counter_word() >= 1){
+          runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_word")))
+
+        } else
+
+          if(download_counter_word() == 0){
+            runjs(sprintf('$("#%s").css({"background-color": "orange", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_word")))
+          }
+
+
+      })
+
+
+      observeEvent(download_counter_zip(), {
+
+
+        req(control_06())
+        if(download_counter_zip() >= 1){
+          runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_zip")))
+
+        } else
+
+          if(download_counter_word() == 0){
+            runjs(sprintf('$("#%s").css({"background-color": "orange", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_word")))
+          }
+
+
+      })
+
+
       # # # PDF
       output$download_button_pdf <- downloadHandler(
         filename = function() {
@@ -1032,7 +1120,7 @@ module_diplo_001_clase09_p02_server <- function(id){
         },
         content = function(file) {
           file.copy(output_path_pdf(), file, overwrite = TRUE)
-          download_counter_pdf (download_counter_pdf () + 1)
+          download_counter_pdf (download_counter_pdf() + 1)
         }
       )
 
@@ -1044,7 +1132,7 @@ module_diplo_001_clase09_p02_server <- function(id){
         },
         content = function(file) {
           file.copy(output_path_html(), file, overwrite = TRUE)
-          download_counter_html (download_counter_html () + 1)
+          download_counter_html(download_counter_html() + 1)
         }
       )
 
@@ -1056,7 +1144,7 @@ module_diplo_001_clase09_p02_server <- function(id){
         },
         content = function(file) {
           file.copy(output_path_word(), file, overwrite = TRUE)
-          download_counter_word (download_counter_word () + 1)
+          download_counter_word(download_counter_word() + 1)
 
         }
       )
@@ -1071,7 +1159,7 @@ module_diplo_001_clase09_p02_server <- function(id){
           #files <- c(output_path_pdf(), output_path_html(), output_path_word())
           #zip(file, files)
           file.copy(output_path_zip(), file, overwrite = TRUE)
-          download_counter_zip (download_counter_zip () + 1)
+          download_counter_zip(download_counter_zip() + 1)
 
         }
       )
@@ -1097,6 +1185,10 @@ module_diplo_001_clase09_p02_server <- function(id){
 
         return(armado_v)
       })
+
+
+
+
 
 
 
@@ -1132,9 +1224,9 @@ module_diplo_001_clase09_p02_serverB <- function(id){
                    shiny::selectInput(
                      inputId = ns("data_source"),
                      label = "Fuente de datos",
-                     choices = c("CSV files" = "csv_source",
-                                 "Diplo UNC" = "diplo_source",
-                                 "R examples" = "r_source")
+                     choices = c("01 - CSV files" = "csv_source",
+                                 "02 - Diplo UNC" = "diplo_source",
+                                 "03 - R examples" = "r_source")
                    )
             ),
             column(7,
@@ -1153,19 +1245,19 @@ module_diplo_001_clase09_p02_serverB <- function(id){
                            )
                          ),
                          fluidRow(
-                           column(1, radioButtons(
+                           column(2, radioButtons(
                              inputId = ns("csv_header"),
                              label = "header",
                              choices = c("TRUE" = TRUE, "FALSE" = FALSE),
                              selected = TRUE
                            )),
-                           column(3, radioButtons(
+                           column(4, radioButtons(
                              inputId = ns("csv_sep"),
                              label = "Separador de columnas",
                              choices = c("semicolon (;)" = ";", "comma (,)" = ","),
                              selected = ";"
                            )),
-                           column(2, radioButtons(
+                           column(3, radioButtons(
                              inputId = ns("csv_dec"),
                              label = "Decimal",
                              choices = c("Period (.)" = ".", "Comma (,)" = ","),
@@ -1262,10 +1354,10 @@ module_diplo_001_clase09_p02_serverB <- function(id){
                 #h3("- Variable cuantitativa seleccionada - OK!"),
                 #h3("- Reporte y script - OK!"),
                 actionButton(ns("render_report_button"), "Render Report", width = "100%"),
-                downloadButton(outputId = ns('download_button_pdf'),  label = "Download PDF", width = "100%", disabled = TRUE),
-                downloadButton(outputId = ns('download_button_html'), label = "Download HTML", width = "100%", disabled = TRUE),
-                downloadButton(outputId = ns('download_button_word'), label = "Download WORD", width = "100%", disabled = TRUE),
-                downloadButton(outputId = ns('download_button_zip'),  label = "Download All (ZIP)", width = "100%", disabled = TRUE)
+                downloadButton(outputId = ns('download_button_pdf'),  label = "PDF", width = "100%", disabled = TRUE),
+                downloadButton(outputId = ns('download_button_html'), label = "HTML", width = "100%", disabled = TRUE),
+                downloadButton(outputId = ns('download_button_word'), label = "WORD", width = "100%", disabled = TRUE),
+                downloadButton(outputId = ns('download_button_zip'),  label = "All (ZIP)", width = "100%", disabled = TRUE)
               )
             )
         )

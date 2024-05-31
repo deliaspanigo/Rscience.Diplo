@@ -26,7 +26,7 @@ ui <- shinydashboard::dashboardPage(
       shiny::br(),
       shiny::br(),
       shinydashboard::menuItem(text = "Clase 99", tabName = "tab_clase99", icon = shiny::icon("th")),
-      shinydashboard::menuItem(text = "Clase 01", tabName = "tab_clase01", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Clase 01", tabName = "tab_clase01_p01", icon = shiny::icon("th")),
 
       shinydashboard::menuItem(text = "Clase 02-P01", tabName = "tab_clase02_p01", icon = shiny::icon("th")),
       shinydashboard::menuItem(text = "Clase 02-P02", tabName = "tab_clase02_p02", icon = shiny::icon("th")),
@@ -43,15 +43,15 @@ ui <- shinydashboard::dashboardPage(
 
       shinydashboard::menuItem(text = "Clase 08 - ANOVA 1 Factor", tabName = "tab_clase08_p01", icon = shiny::icon("th")),
 
-      shinydashboard::menuItem(text = "Clase 09 - Anova 1 Factor con Bloque***", tabName = "tab_clase09_p01", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Clase 09 - Anova 1 Factor con Bloque", tabName = "tab_clase09_p01", icon = shiny::icon("th")),
       shinydashboard::menuItem(text = "Clase 09 - Kruskal-Wallis", tabName = "tab_clase09_p02", icon = shiny::icon("th")),
-      shinydashboard::menuItem(text = "Clase 09 - Friedman***", tabName = "tab_clase09_p03", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Clase 09 - Friedman", tabName = "tab_clase09_p03", icon = shiny::icon("th")),
 
       shinydashboard::menuItem(text = "Clase 10 - Correlación", tabName = "tab_clase10_p01", icon = shiny::icon("th")),
 
       shinydashboard::menuItem(text = "Clase 11 - RLS", tabName = "tab_clase11_p01", icon = shiny::icon("th")),
 
-      shinydashboard::menuItem(text = "Clase 12", tabName = "tab_clase12", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Clase 12 - Chi Cuadrado", tabName = "tab_clase12_p01", icon = shiny::icon("th")),
       shinydashboard::menuItem(
         text = "Control",
         shinydashboard::menuSubItem(
@@ -68,8 +68,8 @@ ui <- shinydashboard::dashboardPage(
                               module_diplo_001_clase99_ui("space_clase99")), # Final - tab_clase99
 
 
-      shinydashboard::tabItem(tabName = "tab_clase01",
-                              module_diplo_001_clase01_ui("space_clase01")), # Final - tab_clase01
+      shinydashboard::tabItem(tabName = "tab_clase01_p01",
+                              module_diplo_001_clase01_p01_ui("space_clase01_p01")), # Final - tab_clase01
 
       shinydashboard::tabItem(tabName = "tab_clase02_p01",
                               module_diplo_001_clase02_p01_ui("space_clase02_p01")), # Final - tab_clase02_p01
@@ -108,8 +108,10 @@ ui <- shinydashboard::dashboardPage(
                               module_diplo_001_clase10_p01_ui("space_clase10_p01")), # Final - tab_clase03_p01
 
       shinydashboard::tabItem(tabName = "tab_clase11_p01",
-                              module_diplo_001_clase11_p01_ui("space_clase11_p01")) # Final - tab_clase03_p01
+                              module_diplo_001_clase11_p01_ui("space_clase11_p01")), # Final - tab_clase03_p01
 
+      shinydashboard::tabItem(tabName = "tab_clase12_p01",
+                              module_diplo_001_clase12_p01_ui("space_clase12_p01")) # Final - tab_clase03_p01
     )
     )
     )
@@ -124,8 +126,8 @@ server <- function(input, output) {
   module_diplo_001_clase99_server("space_clase99")
 
   # Server - Clase 01
-  module_diplo_001_clase01_server("space_clase01")
-  module_diplo_001_clase01_serverB("space_clase01")
+  module_diplo_001_clase01_p01_serverA("space_clase01_p01")
+  module_diplo_001_clase01_p01_serverB("space_clase01_p01")
 
   # Server - Clase 02_p01
   module_diplo_001_clase02_p01_server("space_clase02_p01")
@@ -181,7 +183,9 @@ server <- function(input, output) {
   module_diplo_001_clase11_p01_server("space_clase11_p01")
   module_diplo_001_clase11_p01_serverB("space_clase11_p01")
 
-
+  # Server - Clase 12_p01
+  module_diplo_001_clase12_p01_server("space_clase12_p01")
+  module_diplo_001_clase12_p01_serverB("space_clase12_p01")
   #module_diplo_001_clase01_serverC("space_clase01")
 } #--- Fin server
 

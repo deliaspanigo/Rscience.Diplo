@@ -47,20 +47,26 @@ module_diplo_001_clase09_p01_ui <- function(id){
 
                     uiOutput(ns("box01_database")),
                     shiny::br(),
-                    shiny::br(),
+                    shiny::br()
+      )
+    ),
 
-                    uiOutput(ns("box02_var_selector")),
-                    shiny::br(),
-                    shiny::br(),
+    shiny::fluidRow(
+      shiny::column(6,
+                    uiOutput(ns("box02_var_selector"))),
 
-                    uiOutput(ns("box03_control_de_mision")),
-                    shiny::br(),
-                    shiny::br(),
+      shiny::column(6,
+                    uiOutput(ns("box03_control_de_mision")))
+    ),
+    shiny::br(),
+    shiny::br(),
 
+    shiny::fluidRow(
+      shiny::column(12,
+                    shiny::textOutput(ns("text_control_general")))),
 
-                    shiny::textOutput(ns("text_control_general")),
-
-
+    shiny::fluidRow(
+      shiny::column(12,
                     uiOutput(ns("box04_report")),
                     br(), br(), br()
       )
@@ -472,6 +478,41 @@ module_diplo_001_clase09_p01_server <- function(id){
 
           req(database(), vector_var_names())
 
+          vector_pos <- 1:ncol(database())
+          vector_letters <- openxlsx::int2col(vector_pos)
+          vector_colnames <- colnames(database())
+
+
+          # Determinar la cantidad máxima de dígitos
+          max_digits <- max(nchar(vector_pos))
+          max_digits <- max(max_digits, 2)
+          vector_order <- sprintf(paste0("%0", max_digits, "d"), vector_pos)
+          vector_numeric <- sapply(database(), is.numeric)
+
+          # Para el usuario
+          vector_names <- paste0(vector_order, " - ", vector_letters, " - ", vector_colnames)
+
+          # Vector de opcion interno (nombre de columnas)
+          vector_options <- vector_colnames
+          names(vector_options) <- vector_names
+          vector_options <- c("Selecciona una..." = "", vector_options)
+
+          div(
+            shiny::selectInput(inputId = ns("selected_block_name"), label = "Bloque",
+                               choices = vector_options,
+                               selected = vector_options[1])
+          )
+
+        })
+
+        output$var_selector04 <- shiny::renderUI({
+
+
+
+          ns <- shiny::NS(id)
+
+          req(database(), vector_var_names())
+
           vector_choices <- c("0.10   (10%)" = "0.10",
                               "0.05    (5%)"  = "0.05",
                               "0.01    (1%)"  = "0.01")
@@ -496,6 +537,11 @@ module_diplo_001_clase09_p01_server <- function(id){
       selected_factor_pos     <- shiny::reactiveVal()
       selected_factor_letter  <- shiny::reactiveVal()
 
+      # Para FACTOR
+      selected_block_name    <- shiny::reactiveVal()
+      selected_block_pos     <- shiny::reactiveVal()
+      selected_block_letter  <- shiny::reactiveVal()
+
       # Para alfa
       selected_alpha_value <- shiny::reactiveVal()
 
@@ -509,12 +555,13 @@ module_diplo_001_clase09_p01_server <- function(id){
 
         # # # Control sobre input$selected_vr_name
         req(control_03(), input$selected_vr_name, input$selected_factor_name,
-            input$alpha_value)
+            input$selected_block_name, input$alpha_value)
 
 
         validate(
           need(!is.null(input$selected_vr_name),   'Error 006: Problemas con la variable VR seleccionada. Vuelva a cargar el archivo.'),
           need(!is.null(input$selected_factor_name),   'Error 006: Problemas con la variable FACTOR seleccionada. Vuelva a cargar el archivo.'),
+          need(!is.null(input$selected_block_name),   'Error 006: Problemas con la variable BLOQUE seleccionada. Vuelva a cargar el archivo.'),
           need(!is.null(input$alpha_value),   'Error 006: Problemas con el valor de alfa seleccionado. Vuelva a cargar el archivo.'),
           errorClass = "ERROR"
         )
@@ -523,6 +570,7 @@ module_diplo_001_clase09_p01_server <- function(id){
         validate(
           need(input$selected_vr_name != "", 'Seleccione una VR de su base de datos.'),
           need(input$selected_factor_name != "", 'Seleccione un FACTOR de su base de datos.'),
+          need(input$selected_block_name != "", 'Seleccione un BLOQUE de su base de datos.'),
           need(input$alpha_value != "", 'Seleccione un valor de alpha.'),
           errorClass = "AVISO"
         )
@@ -537,6 +585,11 @@ module_diplo_001_clase09_p01_server <- function(id){
         selected_factor_name(input$selected_factor_name)
         selected_factor_pos(match(selected_factor_name(), vector_var_names()))
         selected_factor_letter(openxlsx::int2col(selected_factor_pos()))
+
+        # Para FACTOR
+        selected_block_name(input$selected_block_name)
+        selected_block_pos(match(selected_block_name(), vector_var_names()))
+        selected_block_letter(openxlsx::int2col(selected_block_pos()))
 
         # Para Alfa
         selected_alpha_value(as.numeric(as.character(input$alpha_value)))
@@ -556,20 +609,31 @@ module_diplo_001_clase09_p01_server <- function(id){
         )
 
         validate(
+          need(!is.null(selected_block_name()),   'Error 007: Problemas con el BLOQUE seleccionado. Vuelva a cargar el archivo.'),
+          need(!is.null(selected_block_pos()),    'Error 008: Problemas con el BLOQUE seleccionado. Vuelva a cargar el archivo.'),
+          need(!is.null(selected_block_letter()), 'Error 009: Problemas con el BLOQUE seleccionado. Vuelva a cargar el archivo.'),
+          errorClass = "ERROR"
+        )
+
+        validate(
           need(!is.null(selected_alpha_value()),   'Error 007: Problemas con el valor de alfa seleccionado. Vuelva a cargar el archivo.'),
         )
 
 
         validate(
-          need(sum(colnames(database()) == selected_vr_name()) == 1, 'Error 010: El nombre de variable seleccionado no pertenece a la base.'),
-          need(sum(colnames(database()) == selected_factor_name()) == 1, 'Error 010: El nombre de variable seleccionado no pertenece a la base.'),
+          need(sum(colnames(database()) == selected_vr_name()) == 1, 'Error 010: El nombre de variable respuesta seleccionado no pertenece a la base.'),
+          need(sum(colnames(database()) == selected_factor_name()) == 1, 'Error 010: El nombre de variable seleccionada en FACTOR no pertenece a la base.'),
+          need(sum(colnames(database()) == selected_block_name()) == 1, 'Error 010: El nombre de variable seleccionada en BLOQUE no pertenece a la base.'),
           need(selected_vr_name() != selected_factor_name(), 'Error 010: Las variables VR y FACTOR deben ser diferentes.'),
+          need(selected_vr_name() != selected_block_name(),  'Error 010: Las variables VR y BLOQUE deben ser diferentes.'),
+          need(selected_factor_name() != selected_block_name(), 'Error 010: Las variables FACTOR y BLOQUE deben ser diferentes.'),
           errorClass = "ERROR"
         )
 
         validate(
           need(ncol(database()) >= selected_vr_pos(), 'Error 011: La posición de variable VR no pertenece a la base de datos.'),
           need(ncol(database()) >= selected_factor_pos(), 'Error 011: La posición de variable FACTOR no pertenece a la base de datos.'),
+          need(ncol(database()) >= selected_block_pos(), 'Error 011: La posición de variable BLOQUE no pertenece a la base de datos.'),
           errorClass = "ERROR"
         )
 
@@ -624,6 +688,7 @@ module_diplo_001_clase09_p01_server <- function(id){
 
         ##### SOLO FACTOR ##############################
         vector_factor <- database()[,selected_factor_pos()]
+        vector_factor <- as.character(vector_factor)
 
         validate(
           need((sum(is.na(vector_factor))==0), 'Error 014: La variable FACTOR seleccionada posee al menos una celda sin datos. \n
@@ -639,42 +704,83 @@ module_diplo_001_clase09_p01_server <- function(id){
         )
 
 
-        vector_n <- tapply(vector_vr, vector_factor, length)
+        vector_n_factor <- tapply(vector_vr, vector_factor, length)
         validate(
-          need((length(vector_n)>=2), 'Error 015: Para realizar el test de ANOVA la variable FACTOR debe tener al menos 2 niveles. \n
+          need((length(vector_n_factor)>=2), 'Error 015: Para realizar el test de ANOVA la variable FACTOR debe tener al menos 2 niveles. \n
               Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
           errorClass = "ERROR"
         )
 
 
-        check_reps_lvl <- sum(vector_n >= 2) == length(vector_n)
+        check_reps_lvl_factor <- sum(vector_n_factor >= 2) == length(vector_n_factor)
         validate(
-          need(check_reps_lvl, 'Error 015: Para realizar el test de ANOVA la variable FACTOR debe tener al menos 2 repeticiones en cada nivel del FACTOR. \n
+          need(check_reps_lvl_factor , 'Error 015: Para realizar el test de ANOVA la variable FACTOR debe tener al menos 2 repeticiones en cada nivel del FACTOR. \n
               Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
           errorClass = "ERROR"
         )
 
-        vector_var <- tapply(vector_vr, vector_factor, var)
+        vector_var_factor <- tapply(vector_vr, vector_factor, var)
         validate(
-          need(sum(is.null(vector_var)) == 0, 'Error 015:
+          need(sum(is.null(vector_var_factor)) == 0, 'Error 015:
           Para realizar el test de ANOVA debe ser posible calcular la varianza de cada nivel del factor.\n
               Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
           errorClass = "ERROR"
         )
 
         validate(
-          need(sum(is.na(vector_var)) == 0, 'Error 015:
+          need(sum(is.na(vector_var_factor)) == 0, 'Error 015:
           Para realizar el test de ANOVA debe ser posible calcular la varianza de cada nivel del factor.\n
               Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
           errorClass = "ERROR"
         )
 
         validate(
-          need(sum(vector_var == 0) == 0, 'Error 015:
+          need(sum(vector_var_factor == 0) == 0, 'Error 015:
           Para realizar el test de ANOVA debe ser posible calcular la varianza de cada nivel del factor.\n
               Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
           errorClass = "ERROR"
         )
+
+
+        ##### SOLO BLOQUE ##############################
+        vector_bloque <- database()[,selected_block_pos()]
+        vector_bloque <- as.character(vector_bloque)
+
+
+        validate(
+          need((sum(is.na(vector_bloque))==0), 'Error 014: La variable BLOQUE seleccionada posee al menos una celda sin datos. \n
+              Usted, ¿está trabajando con una base de datos que corresponde a la Diplomatura?.
+              La diplomatura es una iniciación a R por lo que solo veremos código de R aplicable a bases de datos sin celdas vacías.'),
+          errorClass = "ERROR"
+        )
+
+        validate(
+          need((length(vector_bloque)>=1), 'Error 015: La variable BLOQUE seleccionada no posee datos. \n
+              Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
+          errorClass = "ERROR"
+        )
+
+
+        vector_n_bloque <- tapply(vector_vr, vector_bloque, length)
+        validate(
+          need((length(vector_n_bloque)>=2), 'Error 015: Para realizar el test de ANOVA la variable FACTOR debe tener al menos 2 niveles. \n
+              Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
+          errorClass = "ERROR"
+        )
+
+
+        # # # #
+        tabla_fa <- table(vector_factor, vector_bloque)
+        check_combinaciones <- sum(tabla_fa == 0) == 0
+        validate(
+          need(check_combinaciones, 'Error 015: Para realizar el test de ANOVA a 1 Factor con Bloque
+          todas las combinaciones entre los niveles del FACTOR y el BLOQUE
+          deben contener al menos 1 repetición.
+          Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
+          errorClass = "ERROR"
+        )
+
+
         # Como todo esta OK, se habilita el boton de render.
         shinyjs::enable("render_report_button")
         render_button_status(TRUE)
@@ -776,15 +882,18 @@ module_diplo_001_clase09_p01_server <- function(id){
         execution_time <- gsub("[[:punct:]]", "_", original_time)
         execution_time <- gsub(" ", "_", execution_time)
 
+        # Selected class
+        selected_class_part <- "clase09_p01"
+
         # # # Special folder
         the_package_name <- "Rscience.Diplo"
-        special_folder_package <- file.path("extdata", "master_diplo", "clase09_p01")
-        special_folder_local <- file.path("inst", "extdata", "master_diplo", "clase09_p01")
+        special_folder_package <- file.path("extdata", "master_diplo", selected_class_part)
+        special_folder_local <- file.path("inst", special_folder_package)
 
         # # # ---- Input objects ---- # # #
         input_old_str <- "_master"
         input_new_str <- "_mod"
-        input_file_rmd   <- 'report_diplo_clase09_p01_master.Rmd'
+        input_file_rmd   <- paste0("report_diplo_", selected_class_part, "_master.Rmd")
         input_file_css   <- "styles.css"
         input_file_png01 <- "logo_01_unc.png"
         input_file_png02 <- "logo_02_fcefyn.png"
@@ -886,6 +995,7 @@ module_diplo_001_clase09_p01_server <- function(id){
         replacement_list <- list()
         replacement_list$"selected_vr_pos" <- selected_vr_pos()
         replacement_list$"selected_factor_pos" <- selected_factor_pos()
+        replacement_list$"selected_block_pos" <- selected_block_pos()
         replacement_list$".user_file" <- paste0("\"", input$csv_file_path$name, "\"")
         replacement_list$".user_header" <- as.logical(as.character(input$csv_header))
         replacement_list$".user_sep" <- paste0("\"", input$csv_sep, "\"")
@@ -1000,11 +1110,11 @@ module_diplo_001_clase09_p01_server <- function(id){
         shinyjs::enable("download_button_word")
         shinyjs::enable("download_button_zip")
 
-        # # # Y los dejamos en verde...
-        if(download_counter_pdf()  >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_pdf")))
-        if(download_counter_html() >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_html")))
-        if(download_counter_word() >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_word")))
-        if(download_counter_zip()  >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_zip")))
+        # # # # Y los dejamos en verde...
+        # if(download_counter_pdf()  >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_pdf")))
+        # if(download_counter_html() >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_html")))
+        # if(download_counter_word() >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_word")))
+        # if(download_counter_zip()  >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_zip")))
 
 
         return(TRUE)
@@ -1025,6 +1135,95 @@ module_diplo_001_clase09_p01_server <- function(id){
         download_counter_zip(0)
       })
 
+
+
+      observeEvent(input$selected_factor_name, {
+
+        render_button_counter(0)
+        download_counter_pdf(0)
+        download_counter_html(0)
+        download_counter_word(0)
+        download_counter_zip(0)
+      })
+
+      observeEvent(input$selected_block_name, {
+
+        render_button_counter(0)
+        download_counter_pdf(0)
+        download_counter_html(0)
+        download_counter_word(0)
+        download_counter_zip(0)
+      })
+
+
+      observeEvent(download_counter_pdf(), {
+
+
+        req(control_06())
+        if(download_counter_pdf() >= 1){
+          runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_pdf")))
+
+        } else
+
+          if(download_counter_pdf() == 0){
+            runjs(sprintf('$("#%s").css({"background-color": "orange", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_pdf")))
+          }
+
+
+      })
+
+
+      observeEvent(download_counter_html(), {
+
+
+        req(control_06())
+        if(download_counter_html() >= 1){
+          runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_html")))
+
+        } else
+
+          if(download_counter_html() == 0){
+            runjs(sprintf('$("#%s").css({"background-color": "orange", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_html")))
+          }
+
+
+      })
+
+
+      observeEvent(download_counter_word(), {
+
+
+        req(control_06())
+        if(download_counter_word() >= 1){
+          runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_word")))
+
+        } else
+
+          if(download_counter_word() == 0){
+            runjs(sprintf('$("#%s").css({"background-color": "orange", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_word")))
+          }
+
+
+      })
+
+
+      observeEvent(download_counter_zip(), {
+
+
+        req(control_06())
+        if(download_counter_zip() >= 1){
+          runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_zip")))
+
+        } else
+
+          if(download_counter_word() == 0){
+            runjs(sprintf('$("#%s").css({"background-color": "orange", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_word")))
+          }
+
+
+      })
+
+
       # # # PDF
       output$download_button_pdf <- downloadHandler(
         filename = function() {
@@ -1032,7 +1231,7 @@ module_diplo_001_clase09_p01_server <- function(id){
         },
         content = function(file) {
           file.copy(output_path_pdf(), file, overwrite = TRUE)
-          download_counter_pdf (download_counter_pdf () + 1)
+          download_counter_pdf (download_counter_pdf() + 1)
         }
       )
 
@@ -1044,7 +1243,7 @@ module_diplo_001_clase09_p01_server <- function(id){
         },
         content = function(file) {
           file.copy(output_path_html(), file, overwrite = TRUE)
-          download_counter_html (download_counter_html () + 1)
+          download_counter_html(download_counter_html() + 1)
         }
       )
 
@@ -1056,7 +1255,7 @@ module_diplo_001_clase09_p01_server <- function(id){
         },
         content = function(file) {
           file.copy(output_path_word(), file, overwrite = TRUE)
-          download_counter_word (download_counter_word () + 1)
+          download_counter_word(download_counter_word() + 1)
 
         }
       )
@@ -1071,7 +1270,7 @@ module_diplo_001_clase09_p01_server <- function(id){
           #files <- c(output_path_pdf(), output_path_html(), output_path_word())
           #zip(file, files)
           file.copy(output_path_zip(), file, overwrite = TRUE)
-          download_counter_zip (download_counter_zip () + 1)
+          download_counter_zip(download_counter_zip() + 1)
 
         }
       )
@@ -1097,6 +1296,7 @@ module_diplo_001_clase09_p01_server <- function(id){
 
         return(armado_v)
       })
+
 
 
 
@@ -1132,9 +1332,9 @@ module_diplo_001_clase09_p01_serverB <- function(id){
                    shiny::selectInput(
                      inputId = ns("data_source"),
                      label = "Fuente de datos",
-                     choices = c("CSV files" = "csv_source",
-                                 "Diplo UNC" = "diplo_source",
-                                 "R examples" = "r_source")
+                     choices = c("01 - CSV files" = "csv_source",
+                                 "02 - Diplo UNC" = "diplo_source",
+                                 "03 - R examples" = "r_source")
                    )
             ),
             column(7,
@@ -1153,19 +1353,19 @@ module_diplo_001_clase09_p01_serverB <- function(id){
                            )
                          ),
                          fluidRow(
-                           column(1, radioButtons(
+                           column(2, radioButtons(
                              inputId = ns("csv_header"),
                              label = "header",
                              choices = c("TRUE" = TRUE, "FALSE" = FALSE),
                              selected = TRUE
                            )),
-                           column(3, radioButtons(
+                           column(4, radioButtons(
                              inputId = ns("csv_sep"),
                              label = "Separador de columnas",
                              choices = c("semicolon (;)" = ";", "comma (,)" = ","),
                              selected = ";"
                            )),
-                           column(2, radioButtons(
+                           column(3, radioButtons(
                              inputId = ns("csv_dec"),
                              label = "Decimal",
                              choices = c("Period (.)" = ".", "Comma (,)" = ","),
@@ -1190,8 +1390,9 @@ module_diplo_001_clase09_p01_serverB <- function(id){
                                   shiny::selectInput(
                                     inputId = ns("diplo_database"),
                                     label = "Bases de la Diplomatura",
-                                    choices = c("01 - SEMANA01_BASE01_PESOS"  = "SEMANA01_BASE01_PESOS",
-                                                "02 - SEMANA01_BASE02_ALTURA" = "SEMANA01_BASE02_ALTURA")
+                                    choices = c("01 - SEMANA09_BASE01"  = "SEMANA09_BASE01",
+                                                "02 - SEMANA09_BASE02"  = "SEMANA09_BASE02",
+                                                "03 - SEMANA09_BASE03"  = "SEMANA09_BASE03")
                                   )
                            )
                          )
@@ -1234,9 +1435,10 @@ module_diplo_001_clase09_p01_serverB <- function(id){
           closable = FALSE,
           width = 12,
           fluidRow(
-            column(4, shiny::uiOutput(ns("var_selector01"))),
-            column(4, shiny::uiOutput(ns("var_selector02"))),
-            column(4, shiny::uiOutput(ns("var_selector03")))
+            column(3, shiny::uiOutput(ns("var_selector01"))),
+            column(3, shiny::uiOutput(ns("var_selector02"))),
+            column(3, shiny::uiOutput(ns("var_selector03"))),
+            column(3, shiny::uiOutput(ns("var_selector04")))
           )
         )
       })
@@ -1262,10 +1464,10 @@ module_diplo_001_clase09_p01_serverB <- function(id){
                 #h3("- Variable cuantitativa seleccionada - OK!"),
                 #h3("- Reporte y script - OK!"),
                 actionButton(ns("render_report_button"), "Render Report", width = "100%"),
-                downloadButton(outputId = ns('download_button_pdf'),  label = "Download PDF", width = "100%", disabled = TRUE),
-                downloadButton(outputId = ns('download_button_html'), label = "Download HTML", width = "100%", disabled = TRUE),
-                downloadButton(outputId = ns('download_button_word'), label = "Download WORD", width = "100%", disabled = TRUE),
-                downloadButton(outputId = ns('download_button_zip'),  label = "Download All (ZIP)", width = "100%", disabled = TRUE)
+                downloadButton(outputId = ns('download_button_pdf'),  label = "PDF", width = "100%", disabled = TRUE),
+                downloadButton(outputId = ns('download_button_html'), label = "HTML", width = "100%", disabled = TRUE),
+                downloadButton(outputId = ns('download_button_word'), label = "WORD", width = "100%", disabled = TRUE),
+                downloadButton(outputId = ns('download_button_zip'),  label = "All (ZIP)", width = "100%", disabled = TRUE)
               )
             )
         )

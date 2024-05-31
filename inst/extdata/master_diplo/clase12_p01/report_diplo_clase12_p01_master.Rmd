@@ -1,5 +1,5 @@
 ---
-title: "Diplo - Semana 09 - Parte 03 - Friedman"
+title: "Diplo - Semana 12 - Parte 01 - Test Chi Cuadrado"
 author: "David Elias Panigo"
 date: "24-05-2024"
 output:
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <br>
 <br>
 
-## Clase 09 - Parte 03 - Friedman
+## Clase 12 - Parte 01 - Test Chi Cuadrado
 
 ```{r,  include =FALSE}
 knitr::opts_chunk$set(echo=TRUE, comment=NA)
@@ -50,23 +50,14 @@ knitr::opts_chunk$set(echo=TRUE, comment=NA)
 
 
 ```{r, include =T, eval = F, class.source="bg-success"}
-#######################################################
-##### INICIO SCRIPT SEMANA 2 - Capitulo 2
-##### Histograma, Boxplot y opciones gráficas en R
-#######################################################
-```
-<br>
-<br>
-
-```{r, include =T, eval = T, class.source="bg-success"}
-################### Resumen de Script SEMANA 09 ######################
-# Librerias
-library("agricolae")
-library("gplots")
+#########################################################################
+############### INICIO SCRIPT Correlacion ############################
 
 ```
 <br>
 <br>
+
+
 
 
 
@@ -103,38 +94,52 @@ head(x = BASE, n = 5)
 ```{r, echo= F, eval = T, class.source="bg-success"}
 head(x = BASE, n = 5)
 ```
+<br>
+<br>
 
 
 ```{r, include =T, eval =T, class.source="bg-success"}
-# Aislamos una variable en particular de la base de datos.
-VR <- BASE[,selected_vr_pos]
-VR
+# Aislamos ambas variables categoricas en dos objetos
+VC1 <- BASE[,selected_x01_pos]
+VC2 <- BASE[,selected_x02_pos]
+
+# Armamos una tabla de doble entrada
+TABLA_DOBLE <- table(VC1, VC2)
+TABLA_DOBLE
 ```
 <br>
 <br>
 
 ```{r, include =T, eval =T, class.source="bg-success"}
-# Aislamos una variable en particular de la base de datos.
-FACTOR <- BASE[,selected_factor_pos]
-FACTOR <- as.character(FACTOR)
-FACTOR
+# Podriamos haber armado la tabla con las variables cambiados.
+# Otorgaria el mismo resultado estadistico.
+TABLA_DOBLE_INVERTIDA <- table( VC2, VC1)
+TABLA_DOBLE_INVERTIDA
 ```
 <br>
 <br>
 
-```{r, include =T, eval =T, class.source="bg-success"}
-# Aislamos una variable en particular de la base de datos.
-BLOQUE <- BASE[,selected_block_pos]
-BLOQUE <- as.character(BLOQUE)
-BLOQUE
-```
-<br>
-<br>
+
 
 ```{r, include =T, eval = T, class.source="bg-success"}
-#ANOVA 1 Factor
-friedman(judge = BLOQUE, trt = FACTOR, evaluation = VR, 
-         alpha = selected_alpha_value, group = TRUE, console = TRUE)
+# Test Chi Cuadrado de independencia
+RESULTADOS <- chisq.test(TABLA_DOBLE)
+RESULTADOS
+```
+<br>
+<br>
+
+```{r, include =T, eval = T,class.source="bg-success"}
+# Vemos el nombre de todos los objetos contenidos en la salida de R
+names(RESULTADOS)
+
+```
+<br>
+<br>
+
+```{r, include =T, eval = T,class.source="bg-success"}
+# Tablas de frecuencias absolutas observadas
+RESULTADOS$observed
 
 ```
 <br>
@@ -142,32 +147,47 @@ friedman(judge = BLOQUE, trt = FACTOR, evaluation = VR,
 
 
 ```{r, include =T, eval = T,class.source="bg-success"}
-# Grafico de la combinacion FACTOR-BLOQUE
-interaction.plot(FACTOR, BLOQUE, VR, legend = T, 
-                 main = "Gráfico de la combinación FACTOR-BLOQUE",
-                 col=c("black", "red", "green", "orange",
-"blue"))
+# Tablas de frecuencias absolutas esperadas
+RESULTADOS$expected
+
+```
+<br>
+<br>
+
+
+```{r, include =T, eval = T,class.source="bg-success"}
+# Tablas de los residuos basados en las frecuencias absolutas
+# observadas y esperadas. (OBS - ESP)
+RESULTADOS$residuals
+
+```
+<br>
+<br>
+
+
+```{r, include =T, eval = T,class.source="bg-success"}
+# Residuos estudentizados
+RESULTADOS$stdres
+
 ```
 <br>
 <br>
 
 
 
-```{r, include =T, eval = T, class.source="bg-success"}
-# Grafico de medias y desvios por niveles del factor
-boxplot(VR ~ FACTOR)
+```{r, include =T, eval = T,class.source="bg-success"}
+# Salida Chi Cuadrado Exacto
+chisq.test(TABLA_DOBLE, simulate.p.value = TRUE)
+
 ```
 <br>
 <br>
 
 
 ```{r, include =T, eval = F, class.source="bg-success"}
-######################################################
-##### FIN SCRIPT SEMANA 2 - Capitulo 2
-##### Histograma, Boxplot y opciones gráficas en R
-######################################################
+############### FIN SCRIPT Correlacion ##############################
+########################################################################
 ```
-
 <br>
 <br>
 

@@ -59,7 +59,7 @@ knitr::opts_chunk$set(echo=TRUE, comment=NA)
 <br>
 
 ```{r, include =T, eval = T, class.source="bg-success"}
-################### Resumen de Script SEMANA8 ######################
+################### Resumen de Script SEMANA 09 ######################
 # Librerias
 library("agricolae")
 library("gplots")
@@ -122,10 +122,19 @@ FACTOR
 <br>
 <br>
 
+```{r, include =T, eval =T, class.source="bg-success"}
+# Aislamos una variable en particular de la base de datos.
+BLOQUE <- BASE[,selected_block_pos]
+BLOQUE <- as.character(BLOQUE)
+BLOQUE
+```
+<br>
+<br>
+
 ```{r, include =T, eval = T, class.source="bg-success"}
 #ANOVA 1 Factor
-RESULTADOS_ANOVA <- aov(VR ~ FACTOR)
-summary(RESULTADOS_ANOVA)
+RESU_AOV_CON_BLOQUE <- aov(VR ~ FACTOR + BLOQUE)
+summary(RESU_AOV_CON_BLOQUE)
 
 ```
 <br>
@@ -133,7 +142,7 @@ summary(RESULTADOS_ANOVA)
 
 ```{r, include =T, eval = T, class.source="bg-success"}
 # Test para el supuesto de Normalidad de los errores (Shapiro)
-shapiro.test(RESULTADOS_ANOVA$residuals)
+shapiro.test(RESU_AOV_CON_BLOQUE$residuals)
 
 
 ```
@@ -142,14 +151,25 @@ shapiro.test(RESULTADOS_ANOVA$residuals)
 
 ```{r, include =T, eval = T,class.source="bg-success"}
 # Test para el supuesto de Homogeneidad de los errores (Barlett)
-bartlett.test(RESULTADOS_ANOVA$residual ~ FACTOR)
+bartlett.test(RESU_AOV_CON_BLOQUE$residual ~ FACTOR)
 ```
 <br>
 <br>
 
 ```{r, include =T, eval = T,class.source="bg-success"}
+# Grafico de la combinacion FACTOR-BLOQUE
+interaction.plot(FACTOR, BLOQUE, VR, legend = T, 
+                 main = "Gráfico de la combinación FACTOR-BLOQUE",
+                 col=c("black", "red", "green", "orange",
+"blue"))
+```
+<br>
+<br>
+
+
+```{r, include =T, eval = T,class.source="bg-success"}
 # Test de Tukey
-TUKEY <- HSD.test(RESULTADOS_ANOVA, "FACTOR")
+TUKEY <- HSD.test(RESU_AOV_CON_BLOQUE, "FACTOR")
 TUKEY
 ```
 <br>
