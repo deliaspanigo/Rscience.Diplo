@@ -76,7 +76,7 @@ module_diplo_001_clase03_p01_ui <- function(id){
 
 
 
-module_diplo_001_clase03_p01_server <- function(id){
+module_diplo_001_clase03_p01_serverA <- function(id){
 
   moduleServer(
     id,
@@ -418,7 +418,7 @@ module_diplo_001_clase03_p01_server <- function(id){
           vector_options <- c("Selecciona una..." = "", vector_options)
 
           div(
-            shiny::selectInput(inputId = ns("selected_var_name"), label = "Selecciona una variable cuanlitativa...",
+            shiny::selectInput(inputId = ns("selected_var_name"), label = "Selecciona una variable cualitativa...",
                                choices = vector_options,
                                selected = vector_options[1])
           )

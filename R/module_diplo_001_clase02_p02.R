@@ -76,7 +76,7 @@ module_diplo_001_clase02_p02_ui <- function(id){
 
 
 
-module_diplo_001_clase02_p02_server <- function(id){
+module_diplo_001_clase02_p02_serverA <- function(id){
 
   moduleServer(
     id,

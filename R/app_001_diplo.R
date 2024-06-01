@@ -132,61 +132,61 @@ server <- function(input, output) {
   module_diplo_001_clase01_p01_serverB("space_clase01_p01")
 
   # Server - Clase 02_p01
-  module_diplo_001_clase02_p01_server("space_clase02_p01")
+  module_diplo_001_clase02_p01_serverA("space_clase02_p01")
   module_diplo_001_clase02_p01_serverB("space_clase02_p01")
 
 
   # Server - Clase 02_p02
-  module_diplo_001_clase02_p02_server("space_clase02_p02")
+  module_diplo_001_clase02_p02_serverA("space_clase02_p02")
   module_diplo_001_clase02_p02_serverB("space_clase02_p02")
 
 
   # Server - Clase 03_p01
-  module_diplo_001_clase03_p01_server("space_clase03_p01")
+  module_diplo_001_clase03_p01_serverA("space_clase03_p01")
   module_diplo_001_clase03_p01_serverB("space_clase03_p01")
 
   # Server - Clase 04_p01
-  module_diplo_001_clase04_p01_server("space_clase04_p01")
+  module_diplo_001_clase04_p01_serverA("space_clase04_p01")
   module_diplo_001_clase04_p01_serverB("space_clase04_p01")
 
   # Server - Clase 05_p01
-  module_diplo_001_clase05_p01_server("space_clase05_p01")
+  module_diplo_001_clase05_p01_serverA("space_clase05_p01")
   module_diplo_001_clase05_p01_serverB("space_clase05_p01")
 
   # Server - Clase 06_p01
-  module_diplo_001_clase06_p01_server("space_clase06_p01")
+  module_diplo_001_clase06_p01_serverA("space_clase06_p01")
   module_diplo_001_clase06_p01_serverB("space_clase06_p01")
 
   # Server - Clase 07_p01
-  module_diplo_001_clase07_p01_server("space_clase07_p01")
+  module_diplo_001_clase07_p01_serverA("space_clase07_p01")
   module_diplo_001_clase07_p01_serverB("space_clase07_p01")
 
   # Server - Clase 08_p01
-  module_diplo_001_clase08_p01_server("space_clase08_p01")
+  module_diplo_001_clase08_p01_serverA("space_clase08_p01")
   module_diplo_001_clase08_p01_serverB("space_clase08_p01")
 
   # Server - Clase 09_p01
-  module_diplo_001_clase09_p01_server("space_clase09_p01")
+  module_diplo_001_clase09_p01_serverA("space_clase09_p01")
   module_diplo_001_clase09_p01_serverB("space_clase09_p01")
 
   # Server - Clase 09_p02
-  module_diplo_001_clase09_p02_server("space_clase09_p02")
+  module_diplo_001_clase09_p02_serverA("space_clase09_p02")
   module_diplo_001_clase09_p02_serverB("space_clase09_p02")
 
   # Server - Clase 09_p03
-  module_diplo_001_clase09_p03_server("space_clase09_p03")
+  module_diplo_001_clase09_p03_serverA("space_clase09_p03")
   module_diplo_001_clase09_p03_serverB("space_clase09_p03")
 
   # Server - Clase 10_p01
-  module_diplo_001_clase10_p01_server("space_clase10_p01")
+  module_diplo_001_clase10_p01_serverA("space_clase10_p01")
   module_diplo_001_clase10_p01_serverB("space_clase10_p01")
 
   # Server - Clase 11_p01
-  module_diplo_001_clase11_p01_server("space_clase11_p01")
+  module_diplo_001_clase11_p01_serverA("space_clase11_p01")
   module_diplo_001_clase11_p01_serverB("space_clase11_p01")
 
   # Server - Clase 12_p01
-  module_diplo_001_clase12_p01_server("space_clase12_p01")
+  module_diplo_001_clase12_p01_serverA("space_clase12_p01")
   module_diplo_001_clase12_p01_serverB("space_clase12_p01")
   #module_diplo_001_clase01_serverC("space_clase01")
 } #--- Fin server
