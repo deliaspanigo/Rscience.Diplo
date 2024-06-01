@@ -3,6 +3,11 @@
 #if (!require("shinydashboard")) install.packages("shinydashboard")
 
 
+# https://ubco-biology.github.io/BIOL202/pdf-latex-is-not-found.html
+#install.packages("tinytex", dependencies = TRUE)
+#library("tinytex")
+#tinytex::install_tinytex()
+
 app_001_diplo <- function(){
 
   library(shiny)

@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
 ## Clase 02 - Parte 01 - Medidas de Posición y Dispersión
 
 ```{r,  include =FALSE}
+library("knitr")
 knitr::opts_chunk$set(echo=TRUE, comment=NA)
 # BASE <- mtcars
 #selected_var_pos <- _selected_pos_var_ 
