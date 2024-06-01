@@ -10,6 +10,7 @@ app_001_diplo <- function(){
   library(DT)
   library(openxlsx)
   library(shinyjs)
+  library(markdown)
   library(rmarkdown)
   library(Rscience.Diplo)
   #ruta_css <- system.file("www", "estilos.css", package = "miPaquete")
@@ -25,7 +26,8 @@ ui <- shinydashboard::dashboardPage(
       "Diplo - 0.0.1",
       shiny::br(),
       shiny::br(),
-      shinydashboard::menuItem(text = "Clase 99", tabName = "tab_clase99", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Inicio", tabName = "tab_clase99", icon = shiny::icon("th")),
+      br(),
       shinydashboard::menuItem(text = "Clase 01", tabName = "tab_clase01_p01", icon = shiny::icon("th")),
 
       shinydashboard::menuItem(text = "Clase 02-P01", tabName = "tab_clase02_p01", icon = shiny::icon("th")),

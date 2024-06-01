@@ -1284,8 +1284,11 @@ module_diplo_001_clase08_p01_serverB <- function(id){
                                   shiny::selectInput(
                                     inputId = ns("diplo_database"),
                                     label = "Bases de la Diplomatura",
-                                    choices = c("01 - SEMANA01_BASE01_PESOS"  = "SEMANA01_BASE01_PESOS",
-                                                "02 - SEMANA01_BASE02_ALTURA" = "SEMANA01_BASE02_ALTURA")
+                                    choices = c(    "Seleccione una..." = "",
+                                                "01 - SEMANA08_BASE01"  = "SEMANA08_BASE01",
+                                                "02 - SEMANA08_BASE02"  = "SEMANA08_BASE02",
+                                                "03 - SEMANA08_BASE03"  = "SEMANA08_BASE03",
+                                                "04 - SEMANA08_BASE04"  = "SEMANA08_BASE04")
                                   )
                            )
                          )

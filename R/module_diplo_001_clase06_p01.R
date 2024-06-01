@@ -1023,8 +1023,23 @@ module_diplo_001_clase06_p01_serverB <- function(id){
                                   shiny::selectInput(
                                     inputId = ns("diplo_database"),
                                     label = "Bases de la Diplomatura",
-                                    choices = c("01 - SEMANA01_BASE01_PESOS"  = "SEMANA01_BASE01_PESOS",
-                                                "02 - SEMANA01_BASE02_ALTURA" = "SEMANA01_BASE02_ALTURA")
+                                    choices = c("Seleccione una..." = "",
+                                                "01 - SEMANA06_BASE01"  = "SEMANA06_BASE01",
+                                                "02 - SEMANA06_BASE02"  = "SEMANA06_BASE02",
+                                                "03 - SEMANA06_BASE03"  = "SEMANA06_BASE03",
+                                                "04 - SEMANA06_BASE04"  = "SEMANA06_BASE04",
+                                                "05 - SEMANA06_BASE05"  = "SEMANA06_BASE05",
+                                                "06 - SEMANA06_BASE06"  = "SEMANA06_BASE06",
+                                                "07 - SEMANA06_BASE07"  = "SEMANA06_BASE07",
+                                                "08 - SEMANA06_BASE08"  = "SEMANA06_BASE08",
+                                                "09 - SEMANA06_BASE09"  = "SEMANA06_BASE09",
+                                                "10 - SEMANA06_BASE10"  = "SEMANA06_BASE10",
+                                                "11 - SEMANA06_BASE11"  = "SEMANA06_BASE11",
+                                                "12 - SEMANA06_BASE12"  = "SEMANA06_BASE12",
+                                                "13 - SEMANA06_BASE13"  = "SEMANA06_BASE13",
+                                                "14 - SEMANA06_BASE14"  = "SEMANA06_BASE14",
+                                                "15 - SEMANA06_BASE15"  = "SEMANA06_BASE15",
+                                                "16 - SEMANA06_BASE16"  = "SEMANA06_BASE16")
                                   )
                            )
                          )
