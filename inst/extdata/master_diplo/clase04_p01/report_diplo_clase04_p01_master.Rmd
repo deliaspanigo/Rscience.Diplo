@@ -1,6 +1,6 @@
 ---
 title: "Diplo - Semana 04 - Parte 01 - Gráficos"
-author: "David Elias Panigo"
+author: "EFADoC - UNC"
 date: "24-05-2024"
 output:
   html_document:
@@ -49,173 +49,200 @@ knitr::opts_chunk$set(echo=TRUE, comment=NA)
 ```
 
 
-```{r, include =T, eval = F, class.source="bg-success"}
+```{r, include = T, eval = F, class.source="bg-success"}
 #########################################################################
 ##### INICIO SCRIPT SEMANA 3 - Capitulo 2
 ##### Gráfico de Barras, Torta, opciones gráficas en R + Tablas de Frecuencias 
 #########################################################################
 ```
 
+
+```{r, include = T, eval = T, class.source="bg-success"}
+# Gráfico de la distribucion normal estandard.
+x=seq(-4,4,length=200)
+y=dnorm(x,mean=0,sd=1)
+plot(x,y,type="l",lwd=2,col="red")
+```
 <br>
 <br>
 
-```{r, include = data_source == "csv_source", eval = F, class.source="bg-success"}
-# Nombre y extension de mi archivo csv
-MI_ARCHIVO <- .user_file
-
-# Cargamos la Base de Datos
-BASE <- read.csv(file = MI_ARCHIVO,
-                header = .user_header,
-                sep = .user_sep,
-                dec = .user_dec)
-
-# Visualizamos la base de datos
-head(x = BASE, n = 5)
+```{r, include = T, eval = T, class.source="bg-success"}
+# Gráfico de la distribucion normal. 
+# Ojo, debo cambiar los valores del minimo y máximo del eje x (en este caso está 130 y 210). 
+# Debo cambiar los valores de la media y el desvío estandard. 
+# Está en color azul (blue)
+x=seq(130,210,length=200)
+y=dnorm(x,mean=170,sd=10)
+plot(x,y,type="l",lwd=2,col="blue")
 ```
+<br>
+<br>
 
-```{r, include = data_source == "r_source", eval = F, class.source="bg-success"}
-# Seleccionamos una base de datos de R
-BASE <- .r_name_database
-
-# Solo se visualizan las primeras 10 filas
-head(x = BASE, n = 5)
+```{r, include = T, eval = T, class.source="bg-success"}
+# Gráfico de la distribucion t de Student.
+# Ojo, debo cambiar donde dice ngl los grados de libertad.
+ngl <- 4
+x <- seq(-4, 4, length=5000)
+plot(x, dt(x,ngl), main=c("Densidad t-Student"), 
+     sub=paste("gl=",ngl), ylab="t-Student", type="l",col=3)
 ```
+<br>
+<br>
 
-```{r, include = data_source == "diplo_source", eval = F, class.source="bg-success"}
-# Seleccionamos una base de datos de la Diplomatura
-BASE <- .diplo_name_database
-
-# Solo se visualizan las primeras 10 filas
-head(x = BASE, n = 5)
+```{r, include = T, eval = T, class.source="bg-success"}
+# Gráfico de la distribucion Chi cuadrado. 
+# Ojo, debo cambiar donde dice ngl los grados de libertad
+ngl <- 4
+x <- seq(0, ngl*3, length=5000)
+plot(x, dchisq(x,ngl), main=c("Densidad Chi-cuadrado"), 
+     sub=paste("gl=",ngl), ylab="chi",type="l", col=3)
 ```
-
-```{r, echo= F, eval = T, class.source="bg-success"}
-head(x = BASE, n = 5)
-```
-
+<br>
+<br>
 
 ```{r, include =T, eval =T, class.source="bg-success"}
-# Aislamos una variable en particular de la base de datos.
-VC <- BASE[,selected_var_pos]
-VC
+# Gráfico de la distribucion F de Fisher o Snedecor. 
+# Ojo, debo cambiar donde dice gl.n los grados de libertad del numerador 
+# y donde dice gl.d los del denominador
+gl.n <- 9
+gl.d <- 15
+x <- seq(0, 6, length=5000)
+plot(x, df(x,gl.n,gl.d), main=c("Densidad F de Snedecor_Fisher"),
+      sub=paste("gl=",gl.n,",",gl.d), ylab="F-Snedecor_Fisher",type="l",col=3)
 ```
 <br>
 <br>
 
+### Probabilidad en Distribuciones Normales
 ```{r, include =T, eval = T, class.source="bg-success"}
-# Creación de la Tabla de Frecuencias Absolutas
-TABLA_FA <- table(VC)
-
-# Visualización de las Frecuencias Absolutas
-TABLA_FA
+#Probabilidad acumulada en una Normal Estandard 
+# desde -Infinito hasta x (x aqui es 1.5)
+pnorm(1.5, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
 
 ```
 <br>
 <br>
 
 ```{r, include =T, eval = T,class.source="bg-success"}
-# Creación de la Tabla de Frecuencias Relativas
-TABLA_FR <- prop.table(TABLA_FA)
-
-# Visualización de las Frecuencias Relativas
-TABLA_FR
-
+#Probabilidad acumulada en una Normal Estandard 
+# desde x hasta Infinito (x aqui es 1.5)
+pnorm(1.5, mean = 0, sd = 1, lower.tail = FALSE)
 ```
 <br>
 <br>
 
 ```{r, include =T, eval = T,class.source="bg-success"}
-# Creación de la Tabla de Frecuencias Relativas Redondeada
-TABLA_FR_REDONDEADA <- round(TABLA_FR, 2)
-
-# Visualización de las Frecuencias Redondeadas
-TABLA_FR_REDONDEADA 
+#Probabilidad acumulada en una Normal 
+# desde -Infinito hasta x (x aqui es 170, la media es 175 y el desvio 10)
+pnorm(170, mean =175, sd = 10, lower.tail = TRUE, log.p = FALSE)
 
 ```
 <br>
 <br>
 
 ```{r, include =T, eval = T, class.source="bg-success"}
-# Gráfico de Barras de Frecuencias Absolutas sin agredados
-barplot(TABLA_FA)
+#Probabilidad acumulada en una Normal x hasta Infinito (x aqui es 170, la media es 175 y el desvio 10)
+pnorm(170, mean = 175, sd = 10, lower.tail = F)
 ```
 <br>
 <br>
 
 
+### Probabilidad en Distribución t
 ```{r, include =T, eval = T, class.source="bg-success"}
-# Gráfico de Barras, FA, rojo, límite del eje Y en 60
-barplot(TABLA_FA, col="red", ylim=c(0,60))
+# Probabilidad acumulada en una distribución t de Student 
+# desde -Infinito hasta el valor x, aquí x= 2 y los grados de libertad = 4, 
+# el 0 (cero) es un factor de corrimiento que no utilizaremos.
+pt(2, 4, 0, lower.tail = TRUE, log.p = FALSE)
+
+# Probabilidad acumulada en una distribución t de Student 
+# desde x hasta Infinito, aquí x= 2 y los grados de libertad= 10, el 0 (cero) 
+# es un factor de corrimiento que no utilizaremos.
+pt(2, 10, 0, lower.tail = FALSE)
 ```
 <br>
 <br>
 
+### Probabilidad en Distribución Chi Cuadrado
 ```{r, include =T, eval = T, class.source="bg-success"}
-# Gráfico de Frecuencias Relativas en rojo
-barplot(TABLA_FR, col="red")
+# Probabilidad acumulada en una distribución Chi cuadrado 
+# desde 0 (cero) hasta el valor x (aquí x=2 y los grados de libertad son 4)
+pchisq(2, 4, lower.tail = TRUE)
+
+
+# Probabilidad acumulada en una distribución Chi cuadrado 
+# desde un valor x hasta Infinito (aquí x=2 y los grados de libertad son 4)
+pchisq(2, 4, lower.tail = FALSE )
+
 ```
 <br>
 <br>
 
+
+### Probabilidad en Distribución F
 ```{r, include =T, eval = T, class.source="bg-success"}
-# Gráfico de Frecuencias Relativas en rojo. Máximo del eje Y en 1
-barplot(TABLA_FR, col="red", ylim=c(0,1))
+# Probabilidad acumulada en una distribución F de Fisher-Snedecor
+# desde el 0 (cero) hasta un valor x (aquí x= 2 y los grados de libertad 
+# son 9 y 15 respectivamente)
+pf(2, 9, 15, lower.tail = TRUE)
+
+# Probabilidad acumulada en una distribución F de Fisher-Snedecor 
+# desde un valor x hasta Infinito (aquí x= 2 y los grados de libertad 
+# son 9 y 15 respectivamente)
+pf(2, 9, 15, lower.tail = FALSE)
+
 ```
 <br>
 <br>
 
 
+### Valores Críticos en una distribución Normal
 ```{r, include =T, eval = T, class.source="bg-success"}
-# Gráfico de Frecuencias Relativas en rojo. Máximo del eje Y en 0.8
-barplot(TABLA_FR, col="red", ylim=c(0,0.8))
+#Valor crítico que acumula en una Normal Estandard 
+# desde -Infinito hasta el una probabilidad determinada (aquí la probabilidad es es 0.95)
+qnorm(0.95, mean = 0, sd = 1)
+
+# Valor crítico que acumula en una Normal desde -Infinito hasta él una probabilidad determinada
+# (aquí la probabilidad es es 0.95, la media 170 y el desvio estandard 10)
+qnorm(0.95, mean = 175, sd = 10)
 ```
 <br>
 <br>
 
+
+### Valores Críticos en uan distribución t
 ```{r, include =T, eval = T, class.source="bg-success"}
-# Gráfico de Torta de Frecuencias Relativas
-pie(TABLA_FA)
+#Valor crítico que acumula en una Distribucion t de Student desde -Infinito 
+# hasta él una probabilidad determinada (aquí la probabilidad es es 0.9, 
+# los grados de libertad son 10)
+qt(0.9, 10, 0, lower.tail = TRUE, log.p = FALSE)
+
 ```
 <br>
 <br>
 
+### Valores Críticos en una distribución Chi Cuadrado
 ```{r, include =T, eval = T, class.source="bg-success"}
-# Gráfico de Torta, cada porción de un color diferente
-pie(TABLA_FA, col=c("red","blue","green"))
+# Valor crítico que acumula en una Distribucion Chi cuadrado 
+# desde 0 (cero) hasta él una probabilidad determinada 
+# (aquí la probabilidad es es 0.95, los grados de libertad son 8)
+qchisq(0.95, 8, lower.tail = TRUE)
+
 ```
 <br>
 <br>
 
+
+### Valores Críticos en una distribución F
 ```{r, include =T, eval = T, class.source="bg-success"}
-# Tabla Nueva por Columnas
-TABLA_NUEVA1 <- cbind(TABLA_FA, TABLA_FR)
-colnames(TABLA_NUEVA1) <- c("Frec. Abs.", "Frec. Rel.")
-TABLA_NUEVA1 
-
+#Valor crítico que acumula en una Distribución F de Fisher-Snedecor 
+# desde 0 (cero) hasta él una probabilidad determinada 
+# (aquí la probabilidad es 0.95, los grados de libertad son 9 y 15 respectivamente)
+qf(0.95, 9, 15, lower.tail = TRUE )
 ```
 <br>
 <br>
 
-
-```{r, include =T, eval = T, class.source="bg-success"}
-# Tabla Nueva por Filas
-TABLA_NUEVA2 <- rbind(TABLA_FA, TABLA_FR)
-rownames(TABLA_NUEVA2) <- c("Frec. Abs.", "Frec. Rel.")
-TABLA_NUEVA2
-
-```
-<br>
-<br>
-
-```{r, include =T, eval = F, class.source="bg-success"}
-#########################################################################
-##### FIN SCRIPT SEMANA 3 - Capitulo 2
-##### Gráfico de Barras, Torta, opciones gráficas en R + Tablas de Frecuencias 
-#########################################################################
-```
-
-<br>
-<br>
 
 
 

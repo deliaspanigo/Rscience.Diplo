@@ -33,32 +33,32 @@ ui <- shinydashboard::dashboardPage(
       shiny::br(),
       shinydashboard::menuItem(text = "Inicio", tabName = "tab_clase99", icon = shiny::icon("th")),
       br(),
-      shinydashboard::menuItem(text = "Clase 01", tabName = "tab_clase01_p01", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 01", tabName = "tab_clase01_p01", icon = shiny::icon("th")),
 
-      shinydashboard::menuItem(text = "Clase 02-P01", tabName = "tab_clase02_p01", icon = shiny::icon("th")),
-      shinydashboard::menuItem(text = "Clase 02-P02", tabName = "tab_clase02_p02", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 02-P01", tabName = "tab_clase02_p01", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 02-P02", tabName = "tab_clase02_p02", icon = shiny::icon("th")),
 
-      shinydashboard::menuItem(text = "Clase 03", tabName = "tab_clase03_p01", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 03", tabName = "tab_clase03_p01", icon = shiny::icon("th")),
 
-      shinydashboard::menuItem(text = "Clase 04***", tabName = "tab_clase04_p01", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 04 - Probabilidad", tabName = "tab_clase04_p01", icon = shiny::icon("th")),
 
-      shinydashboard::menuItem(text = "Clase 05***", tabName = "tab_clase05_p01", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 05***", tabName = "tab_clase05_p01", icon = shiny::icon("th")),
 
-      shinydashboard::menuItem(text = "Clase 06***", tabName = "tab_clase06_p01", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 06***", tabName = "tab_clase06_p01", icon = shiny::icon("th")),
 
-      shinydashboard::menuItem(text = "Clase 07***", tabName = "tab_clase07_p01", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 07***", tabName = "tab_clase07_p01", icon = shiny::icon("th")),
 
-      shinydashboard::menuItem(text = "Clase 08 - ANOVA 1 Factor", tabName = "tab_clase08_p01", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 08 - ANOVA 1 Factor", tabName = "tab_clase08_p01", icon = shiny::icon("th")),
 
-      shinydashboard::menuItem(text = "Clase 09 - Anova 1 Factor con Bloque", tabName = "tab_clase09_p01", icon = shiny::icon("th")),
-      shinydashboard::menuItem(text = "Clase 09 - Kruskal-Wallis", tabName = "tab_clase09_p02", icon = shiny::icon("th")),
-      shinydashboard::menuItem(text = "Clase 09 - Friedman", tabName = "tab_clase09_p03", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 09 - Anova 1 Factor con Bloque", tabName = "tab_clase09_p01", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 09 - Kruskal-Wallis", tabName = "tab_clase09_p02", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 09 - Friedman", tabName = "tab_clase09_p03", icon = shiny::icon("th")),
 
-      shinydashboard::menuItem(text = "Clase 10 - Correlación", tabName = "tab_clase10_p01", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 10 - Correlación", tabName = "tab_clase10_p01", icon = shiny::icon("th")),
 
-      shinydashboard::menuItem(text = "Clase 11 - RLS", tabName = "tab_clase11_p01", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 11 - RLS", tabName = "tab_clase11_p01", icon = shiny::icon("th")),
 
-      shinydashboard::menuItem(text = "Clase 12 - Chi Cuadrado", tabName = "tab_clase12_p01", icon = shiny::icon("th")),
+      shinydashboard::menuItem(text = "Semana 12 - Chi Cuadrado", tabName = "tab_clase12_p01", icon = shiny::icon("th")),
       shinydashboard::menuItem(
         text = "Control",
         shinydashboard::menuSubItem(

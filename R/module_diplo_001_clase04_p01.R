@@ -45,17 +45,17 @@ module_diplo_001_clase04_p01_ui <- function(id){
     shiny::fluidRow(
       shiny::column(12,
 
-                    uiOutput(ns("box01_database")),
-                    shiny::br(),
-                    shiny::br(),
+                    # uiOutput(ns("box01_database")),
+                    # shiny::br(),
+                    # shiny::br(),
 
                     shiny::fluidRow(
-                      shiny::column(4, uiOutput(ns("box02_var_selector"))),
+                      #shiny::column(4, uiOutput(ns("box02_var_selector"))),
                       shiny::column(8, uiOutput(ns("box03_control_de_mision")))
                     ),
 
 
-                    shiny::textOutput(ns("text_control_general")),
+                    #shiny::textOutput(ns("text_control_general")),
 
 
                     uiOutput(ns("box04_report")),
@@ -85,11 +85,11 @@ module_diplo_001_clase04_p01_serverA <- function(id){
       # ns para el server!
       ns <- session$ns
 
-      # Objetos iniciales importantes
-      database <- shiny::reactiveVal()
-      load_button_status  <- reactiveVal()
-      load_button_counter <- reactiveVal()
-
+      # # Objetos iniciales importantes
+      # database <- shiny::reactiveVal()
+      # load_button_status  <- reactiveVal()
+      # load_button_counter <- reactiveVal()
+      #
 
       # 1) Control de lo detallado como "data_source"
       # y de lo elegido en el subtipo de fuente de datos. (control01).
@@ -106,332 +106,332 @@ module_diplo_001_clase04_p01_serverA <- function(id){
 
 
 
-      control_01 <- reactive({
-
-        database(NULL)
-        load_button_status(FALSE)
-        load_button_counter <- reactiveVal(0)
-        runjs(sprintf('$("#%s").css({"background-color": "orange", "color": "white", "border": "none", "padding": "30px 30px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "20px", "margin": "4px 4px", "cursor": "pointer", "border-radius": "100%%"});', ns("action_load")))
-
-        ns <- session$ns
-
-        # # # Control sobre input$data_source
-        req(input$"data_source")
-
-        validate(
-          need(!is.null(input$"data_source"), 'Error 001: Problemas en input$data_source.'),
-          errorClass = "ERROR"
-        )
-
-        # Si el archivo es CSV...
-        if(input$"data_source" == "csv_source"){
-
-          req(input$csv_file_path$name)
-
-          csv_file_name <- input$csv_file_path$name
-          final_ext <- tools::file_ext(csv_file_name)
-
-          validate(
-            need(final_ext == "csv", 'Error 002: Solo es posible cargar archivos CSV.\n    Prueba con otro archivo!'),
-            errorClass = "ERROR"
-          )
-        } else
-
-          # Si el archivo es una base de R...
-          if(input$"data_source" == "diplo_source"){
-
-            req(input$diplo_database)
-
-            validate(
-              need(exists(input$diplo_database), 'Error 002: La base seleccionada de la Diplomatura no se encuentra en el entorno de R.\n'),
-              errorClass = "ERROR"
-            )
-          } else
-            # Si el archivo es una base de R...
-            if(input$"data_source" == "r_source"){
-
-              req(input$r_database)
-
-              validate(
-                need(exists(input$r_database), 'Error 002: La base de R seleccionada no se encuentra en el entorno de R.\n'),
-                errorClass = "ERROR"
-              )
-            }
-
-
-        shinyjs::enable("action_load")
-        load_button_status(TRUE)
-        return(TRUE)
-      })
-      ###---###---###---###---###---###---###---###---###---###---###---###---###---###
-
-
-
-      observeEvent(input$action_load, {
-
-        # Todo lo anterior tiene que estar OK.
-        req(control_01())
-
-        load_button_counter(load_button_counter() + 1)
-      })
-
-
-      observeEvent(load_button_counter(), {
-
-        # Todo lo anterior tiene que estar OK.
-        req(control_01())
-
-        #load_button_counter(load_button_counter() + 1)
-        if(load_button_counter() >= 1){
-          runjs(sprintf('$("#%s").css({"background-color": "green",  "color": "white", "border": "none", "padding": "30px 30px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "20px", "margin": "4px 4px", "cursor": "pointer", "border-radius": "100%%"});', ns("action_load")))
-
-        }
-
-        if(load_button_counter() == 0){
-          database(NULL)
-          runjs(sprintf('$("#%s").css({"background-color": "orange", "color": "white", "border": "none", "padding": "30px 30px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "20px", "margin": "4px 4px", "cursor": "pointer", "border-radius": "100%%"});', ns("action_load")))
-        }
-
-
-      })
-
-
-
-      shiny::observeEvent(input$data_source,{
-        database(NULL)
-        load_button_counter(0)
-      })
-
-      shiny::observeEvent(input$diplo_database,{
-        database(NULL)
-        load_button_counter(0)
-      })
-
-      shiny::observeEvent(input$csv_database,{
-
-        database(NULL)
-        load_button_counter(0)
-
-
-
-      })
-
-      shiny::observeEvent(input$csv_header,{
-        database(NULL)
-        load_button_counter(0)
-      })
-
-      shiny::observeEvent(input$csv_sep,{
-        database(NULL)
-        load_button_counter(0)
-      })
-
-      shiny::observeEvent(input$csv_dec,{
-        database(NULL)
-        load_button_counter(0)
-      })
-
-      shiny::observeEvent(input$csv_quote,{
-        database(NULL)
-        load_button_counter(0)
-      })
-
-      shiny::observeEvent(input$r_database,{
-
-
-        database(NULL)
-        load_button_counter(0)
-      })
-
-      ###---###---###---###---###---###---###---###---###---###---###---###---###---###
-
-
-      #--- 2.2) control_02 - load button
-      control_02 <- reactive({
-
-        # # # Control sobre database()
-        req(control_01(),  load_button_status(), load_button_counter()>=1)
-
-        return(TRUE)
-
-      })
-
-
-      #--- 2) Fuente de datos y creacion de database
-      #--- 2.1) Database!!!
-      observe({
-
-        #print(control_02())
-        # Todo lo anterior tiene que estar OK.
-        # Solo ejecuta si el status del load es TRUE y si tiene
-        # un contador de load >= 1, lo que implica que el usuario hizo
-        # clic en "LOAD".
-        req(control_02())
-
-        if(input$data_source == "csv_source"){
-
-          database(utils::read.csv(file = input$csv_file_path$datapath,
-                                   header = as.logical(as.character(input$csv_header)),
-                                   sep = input$csv_sep,
-                                   dec = input$csv_dec,
-                                   stringsAsFactors = FALSE)
-          )
-
-
-        } else
-
-          if(input$data_source == "diplo_source"){
-
-            database(base::eval(base::parse(text = input$"diplo_database")))
-          } else
-
-            if(input$data_source == "r_source"){
-
-              database(base::eval(base::parse(text = input$"r_database")))
-            }
-
-
-      })
-
-
-
-
-      #--- 2.2) control_02 - Control del database()
-      control_03 <- reactive({
-
-        # # # Control sobre database()
-        req(control_02(), database())
-
-        validate(
-          need(!is.null(database()), 'Error 003: Problemas en la base de datos. Vuelva a cargar el archivo'),
-          errorClass = "ERROR"
-        )
-
-        validate(
-          need(is.data.frame(database()), 'Error 004: El objeto debe ser un data.frame.'),
-          errorClass = "ERROR"
-        )
-
-        validate(
-          need((ncol(database())>= 1), 'Error 005: La base de datos debe contener al menos una columna.'),
-          need((nrow(database())>= 1), 'Error 006: La base de datos debe contener al menos una fila.'),
-          errorClass = "ERROR"
-        )
-
-
-
-        return(TRUE)
-
-      })
-
-
-      #--- 2.3) Salida en tabla de la database()
-      output$table_database <- DT::renderDT({
-
-
-        req(control_03())
-
-        # Usar lapply para mostrar los elementos deseados
-
-        mi_tabla <- database()
-        #https://rstudio.github.io/DT/functions.html
-        vector_pos <- 1:nrow(mi_tabla)
-        vector_color <- rep(NA, length(vector_pos))
-        vector_color[c(T, F)] <- "lightblue"#'red'#
-        vector_color[c(F, T)] <- "lightgreen"#'blue'#
-        vector_color <- vector_color[vector_pos]
-
-        datatable(
-          mi_tabla,
-          rownames = FALSE,
-          options = list(
-
-            headerCallback = DT::JS(
-              "function(thead) {",
-              "  $(thead).css('font-size', '2em');",
-              "}"
-            ),
-            columnDefs = list(list(className = 'dt-center', targets = "_all")),
-            pageLength = 5,
-            lengthMenu = c(5, 10, 15, 20),
-            #dom = "t",
-            scrollX = TRUE,
-            searching = FALSE,
-            scrollCollapse = TRUE,  # Permitir colapsar el scroll
-            fixedColumns = list(leftColumns = 3),  # Fijar las primeras 3 columnas
-            #lengthMenu = list(c(-1), c("All")), # Todas las filas
-            style = list(
-              'font-size' = '15px'  # Tamaño de letra para el nombre de las columnas
-            )
-          )
-
-        ) %>%formatStyle(
-          colnames(mi_tabla),
-          backgroundColor = styleRow(vector_pos, vector_color),#,
-          target = 'row',
-          fontSize = "15px"
-        )
-      })
-      ###---###---###---###---###---###---###---###---###---###---###---###---###---###
-
+      # control_01 <- reactive({
+      #
+      #   database(NULL)
+      #   load_button_status(FALSE)
+      #   load_button_counter <- reactiveVal(0)
+      #   runjs(sprintf('$("#%s").css({"background-color": "orange", "color": "white", "border": "none", "padding": "30px 30px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "20px", "margin": "4px 4px", "cursor": "pointer", "border-radius": "100%%"});', ns("action_load")))
+      #
+      #   ns <- session$ns
+      #
+      #   # # # Control sobre input$data_source
+      #   req(input$"data_source")
+      #
+      #   validate(
+      #     need(!is.null(input$"data_source"), 'Error 001: Problemas en input$data_source.'),
+      #     errorClass = "ERROR"
+      #   )
+      #
+      #   # Si el archivo es CSV...
+      #   if(input$"data_source" == "csv_source"){
+      #
+      #     req(input$csv_file_path$name)
+      #
+      #     csv_file_name <- input$csv_file_path$name
+      #     final_ext <- tools::file_ext(csv_file_name)
+      #
+      #     validate(
+      #       need(final_ext == "csv", 'Error 002: Solo es posible cargar archivos CSV.\n    Prueba con otro archivo!'),
+      #       errorClass = "ERROR"
+      #     )
+      #   } else
+      #
+      #     # Si el archivo es una base de R...
+      #     if(input$"data_source" == "diplo_source"){
+      #
+      #       req(input$diplo_database)
+      #
+      #       validate(
+      #         need(exists(input$diplo_database), 'Error 002: La base seleccionada de la Diplomatura no se encuentra en el entorno de R.\n'),
+      #         errorClass = "ERROR"
+      #       )
+      #     } else
+      #       # Si el archivo es una base de R...
+      #       if(input$"data_source" == "r_source"){
+      #
+      #         req(input$r_database)
+      #
+      #         validate(
+      #           need(exists(input$r_database), 'Error 002: La base de R seleccionada no se encuentra en el entorno de R.\n'),
+      #           errorClass = "ERROR"
+      #         )
+      #       }
+      #
+      #
+      #   shinyjs::enable("action_load")
+      #   load_button_status(TRUE)
+      #   return(TRUE)
+      # })
+      # ###---###---###---###---###---###---###---###---###---###---###---###---###---###
+
+
+
+      # observeEvent(input$action_load, {
+      #
+      #   # Todo lo anterior tiene que estar OK.
+      #   req(control_01())
+      #
+      #   load_button_counter(load_button_counter() + 1)
+      # })
+      #
+      #
+      # observeEvent(load_button_counter(), {
+      #
+      #   # Todo lo anterior tiene que estar OK.
+      #   req(control_01())
+      #
+      #   #load_button_counter(load_button_counter() + 1)
+      #   if(load_button_counter() >= 1){
+      #     runjs(sprintf('$("#%s").css({"background-color": "green",  "color": "white", "border": "none", "padding": "30px 30px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "20px", "margin": "4px 4px", "cursor": "pointer", "border-radius": "100%%"});', ns("action_load")))
+      #
+      #   }
+      #
+      #   if(load_button_counter() == 0){
+      #     database(NULL)
+      #     runjs(sprintf('$("#%s").css({"background-color": "orange", "color": "white", "border": "none", "padding": "30px 30px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "20px", "margin": "4px 4px", "cursor": "pointer", "border-radius": "100%%"});', ns("action_load")))
+      #   }
+      #
+      #
+      # })
+      #
+      #
+      #
+      # shiny::observeEvent(input$data_source,{
+      #   database(NULL)
+      #   load_button_counter(0)
+      # })
+      #
+      # shiny::observeEvent(input$diplo_database,{
+      #   database(NULL)
+      #   load_button_counter(0)
+      # })
+      #
+      # shiny::observeEvent(input$csv_database,{
+      #
+      #   database(NULL)
+      #   load_button_counter(0)
+      #
+      #
+      #
+      # })
+      #
+      # shiny::observeEvent(input$csv_header,{
+      #   database(NULL)
+      #   load_button_counter(0)
+      # })
+      #
+      # shiny::observeEvent(input$csv_sep,{
+      #   database(NULL)
+      #   load_button_counter(0)
+      # })
+      #
+      # shiny::observeEvent(input$csv_dec,{
+      #   database(NULL)
+      #   load_button_counter(0)
+      # })
+      #
+      # shiny::observeEvent(input$csv_quote,{
+      #   database(NULL)
+      #   load_button_counter(0)
+      # })
+      #
+      # shiny::observeEvent(input$r_database,{
+      #
+      #
+      #   database(NULL)
+      #   load_button_counter(0)
+      # })
+      #
+      # ###---###---###---###---###---###---###---###---###---###---###---###---###---###
+
+#
+#       #--- 2.2) control_02 - load button
+#       control_02 <- reactive({
+#
+#         # # # Control sobre database()
+#         req(control_01(),  load_button_status(), load_button_counter()>=1)
+#
+#         return(TRUE)
+#
+#       })
+#
+#
+#       #--- 2) Fuente de datos y creacion de database
+#       #--- 2.1) Database!!!
+#       observe({
+#
+#         #print(control_02())
+#         # Todo lo anterior tiene que estar OK.
+#         # Solo ejecuta si el status del load es TRUE y si tiene
+#         # un contador de load >= 1, lo que implica que el usuario hizo
+#         # clic en "LOAD".
+#         req(control_02())
+#
+#         if(input$data_source == "csv_source"){
+#
+#           database(utils::read.csv(file = input$csv_file_path$datapath,
+#                                    header = as.logical(as.character(input$csv_header)),
+#                                    sep = input$csv_sep,
+#                                    dec = input$csv_dec,
+#                                    stringsAsFactors = FALSE)
+#           )
+#
+#
+#         } else
+#
+#           if(input$data_source == "diplo_source"){
+#
+#             database(base::eval(base::parse(text = input$"diplo_database")))
+#           } else
+#
+#             if(input$data_source == "r_source"){
+#
+#               database(base::eval(base::parse(text = input$"r_database")))
+#             }
+#
+#
+#       })
+#
+#
+
+#
+#       #--- 2.2) control_02 - Control del database()
+#       control_03 <- reactive({
+#
+#         # # # Control sobre database()
+#         req(control_02(), database())
+#
+#         validate(
+#           need(!is.null(database()), 'Error 003: Problemas en la base de datos. Vuelva a cargar el archivo'),
+#           errorClass = "ERROR"
+#         )
+#
+#         validate(
+#           need(is.data.frame(database()), 'Error 004: El objeto debe ser un data.frame.'),
+#           errorClass = "ERROR"
+#         )
+#
+#         validate(
+#           need((ncol(database())>= 1), 'Error 005: La base de datos debe contener al menos una columna.'),
+#           need((nrow(database())>= 1), 'Error 006: La base de datos debe contener al menos una fila.'),
+#           errorClass = "ERROR"
+#         )
+#
+#
+#
+#         return(TRUE)
+#
+#       })
+#
+#
+#       #--- 2.3) Salida en tabla de la database()
+#       output$table_database <- DT::renderDT({
+#
+#
+#         req(control_03())
+#
+#         # Usar lapply para mostrar los elementos deseados
+#
+#         mi_tabla <- database()
+#         #https://rstudio.github.io/DT/functions.html
+#         vector_pos <- 1:nrow(mi_tabla)
+#         vector_color <- rep(NA, length(vector_pos))
+#         vector_color[c(T, F)] <- "lightblue"#'red'#
+#         vector_color[c(F, T)] <- "lightgreen"#'blue'#
+#         vector_color <- vector_color[vector_pos]
+#
+#         datatable(
+#           mi_tabla,
+#           rownames = FALSE,
+#           options = list(
+#
+#             headerCallback = DT::JS(
+#               "function(thead) {",
+#               "  $(thead).css('font-size', '2em');",
+#               "}"
+#             ),
+#             columnDefs = list(list(className = 'dt-center', targets = "_all")),
+#             pageLength = 5,
+#             lengthMenu = c(5, 10, 15, 20),
+#             #dom = "t",
+#             scrollX = TRUE,
+#             searching = FALSE,
+#             scrollCollapse = TRUE,  # Permitir colapsar el scroll
+#             fixedColumns = list(leftColumns = 3),  # Fijar las primeras 3 columnas
+#             #lengthMenu = list(c(-1), c("All")), # Todas las filas
+#             style = list(
+#               'font-size' = '15px'  # Tamaño de letra para el nombre de las columnas
+#             )
+#           )
+#
+#         ) %>%formatStyle(
+#           colnames(mi_tabla),
+#           backgroundColor = styleRow(vector_pos, vector_color),#,
+#           target = 'row',
+#           fontSize = "15px"
+#         )
+#       })
+#       ###---###---###---###---###---###---###---###---###---###---###---###---###---###
+#
 
       #--- 3)  Seleccion de una variable
       #--- 3.1) Crear input$selected_var_name
       render_button_status  <- shiny::reactiveVal()
       render_button_counter <- shiny::reactiveVal()
-      vector_var_names  <- shiny::reactiveVal()
-      shiny::observe({
-        # Control hasta inputFile + database()
+      #vector_var_names  <- shiny::reactiveVal()
+      # shiny::observe({
+      #   # Control hasta inputFile + database()
+      #
+      #
+      #   req(control_03())
+      #
+      #   # Nombre de las columnas
+      #   vector_var_names(base::colnames(database()))
+      #
+      #   # Seleccion de una variable cuantitati a
+      #   output$var_selector <- shiny::renderUI({
+      #
+      #
+      #
+      #     ns <- shiny::NS(id)
+      #
+      #     req(database(), vector_var_names())
+      #
+      #     vector_pos <- 1:ncol(database())
+      #     vector_letters <- openxlsx::int2col(vector_pos)
+      #     vector_colnames <- colnames(database())
+      #
+      #
+      #     # Determinar la cantidad máxima de dígitos
+      #     max_digits <- max(nchar(vector_pos))
+      #     max_digits <- max(max_digits, 2)
+      #     vector_order <- sprintf(paste0("%0", max_digits, "d"), vector_pos)
+      #     vector_numeric <- sapply(database(), is.numeric)
+      #
+      #     # Para el usuario
+      #     vector_names <- paste0(vector_order, " - ", vector_letters, " - ", vector_colnames)
+      #
+      #     # Vector de opcion interno (nombre de columnas)
+      #     vector_options <- vector_colnames
+      #     names(vector_options) <- vector_names
+      #     vector_options <- c("Selecciona una..." = "", vector_options)
+      #
+      #     div(
+      #       shiny::selectInput(inputId = ns("selected_var_name"), label = "Selecciona una variable cuantitativa...",
+      #                          choices = vector_options,
+      #                          selected = vector_options[1])
+      #     )
+      #
+      #   })
+      #
+      #
+      # })
+      #
 
-
-        req(control_03())
-
-        # Nombre de las columnas
-        vector_var_names(base::colnames(database()))
-
-        # Seleccion de una variable cuantitati a
-        output$var_selector <- shiny::renderUI({
-
-
-
-          ns <- shiny::NS(id)
-
-          req(database(), vector_var_names())
-
-          vector_pos <- 1:ncol(database())
-          vector_letters <- openxlsx::int2col(vector_pos)
-          vector_colnames <- colnames(database())
-
-
-          # Determinar la cantidad máxima de dígitos
-          max_digits <- max(nchar(vector_pos))
-          max_digits <- max(max_digits, 2)
-          vector_order <- sprintf(paste0("%0", max_digits, "d"), vector_pos)
-          vector_numeric <- sapply(database(), is.numeric)
-
-          # Para el usuario
-          vector_names <- paste0(vector_order, " - ", vector_letters, " - ", vector_colnames)
-
-          # Vector de opcion interno (nombre de columnas)
-          vector_options <- vector_colnames
-          names(vector_options) <- vector_names
-          vector_options <- c("Selecciona una..." = "", vector_options)
-
-          div(
-            shiny::selectInput(inputId = ns("selected_var_name"), label = "Selecciona una variable cuantitativa...",
-                               choices = vector_options,
-                               selected = vector_options[1])
-          )
-
-        })
-
-
-      })
-
-
-      selected_var_name    <- shiny::reactiveVal()
-      selected_var_pos     <- shiny::reactiveVal()
-      selected_var_letter  <- shiny::reactiveVal()
+      # selected_var_name    <- shiny::reactiveVal()
+      # selected_var_pos     <- shiny::reactiveVal()
+      # selected_var_letter  <- shiny::reactiveVal()
       control_04 <- reactive({
 
         render_button_status(FALSE)
@@ -440,74 +440,74 @@ module_diplo_001_clase04_p01_serverA <- function(id){
         runjs(sprintf('$("#%s").css({"background-color": "orange", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("render_report_button")))
 
 
-        # # # Control sobre input$selected_var_name
-        req(control_03(), input$selected_var_name)
-
-        validate(
-          need(!is.null(input$selected_var_name),   'Error 006: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
-          errorClass = "ERROR"
-        )
-
-
-        validate(
-          need(input$selected_var_name != "", 'Seleccione una variable cuantitativa de su base de datos.'),
-          errorClass = "AVISO"
-        )
-
-        selected_var_name(input$selected_var_name)
-        selected_var_pos(match(selected_var_name(), vector_var_names()))
-        selected_var_letter(openxlsx::int2col(selected_var_pos()))
-
-        validate(
-          need(!is.null(selected_var_name()),   'Error 007: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
-          need(!is.null(selected_var_pos()),    'Error 008: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
-          need(!is.null(selected_var_letter()), 'Error 009: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
-          errorClass = "ERROR"
-        )
-
-
-
-        validate(
-          need(sum(colnames(database()) == selected_var_name()) == 1, 'Error 010: El nombre de variable seleccionado no pertenece a la base.'),
-          errorClass = "ERROR"
-        )
-
-        validate(
-          need(ncol(database()) >= selected_var_pos(), 'Error 011: La posición de variable no pertenece a la base de datos.'),
-          errorClass = "ERROR"
-        )
-
-
-        vector_vc <- database()[,selected_var_pos()]
-
-        validate(
-          need((sum(is.na(vector_vc))==0), 'Error 014: La columna seleccionada posee al menos una celda sin datos. \n
-              Usted, ¿está trabajando con una base de datos que corresponde a la Diplomatura?.
-              La diplomatura es una iniciación a R por lo que solo veremos código de R aplicable a bases de datos sin celdas vacías.'),
-          errorClass = "ERROR"
-        )
-
+        # # # # Control sobre input$selected_var_name
+        # req(control_03(), input$selected_var_name)
+        #
         # validate(
-        #   need((is.numeric(vector_vr)), 'Error 015:
-        #   Las medidas resumen solo son aplicables a variables numéricas.
-        #   La variable seleccionada no es numérica.
-        #   Verifique las siguientes opciones:\n
-        #        1) Se equivocó al seleccionar variable con la cual trabajar. Elija la variable cuantitativa correcta.\n
-        #        2) No abrió el archivo csv como archivo de texto en su computadora para tomar noción sobre
-        #        si el archivo tiene como primera fila al nombre de columnas, cual es el separador de columna
-        #        y del separador decimal.\n
-        #        3) Regrese al menú de carga, y verifique que todos las opciones seleccionadas (header, sep, dec) correspondan con lo que usted observa en su archivo CSV en su computadora.\n
-        #        4) Si usted está trabajando con una base de datos que no corresponde a la Semana 01 de la Diplomatura, verifique que todas las celdas de la columna elegida solo contienen números.
-        #        Posiblemente alguna celda de la columna seleccionada posee algún caracter no numérico en alguna celda.\n\n\n\n\n\n\n\n'
-        #   ),
+        #   need(!is.null(input$selected_var_name),   'Error 006: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
         #   errorClass = "ERROR"
         # )
-
-        validate(
-          need((length(vector_vc)>=1), 'Error 015: La columna seleccionada no posee datos. \n
-              Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
-          errorClass = "ERROR"
-        )
+        #
+        #
+        # validate(
+        #   need(input$selected_var_name != "", 'Seleccione una variable cuantitativa de su base de datos.'),
+        #   errorClass = "AVISO"
+        # )
+        #
+        # selected_var_name(input$selected_var_name)
+        # selected_var_pos(match(selected_var_name(), vector_var_names()))
+        # selected_var_letter(openxlsx::int2col(selected_var_pos()))
+        #
+        # validate(
+        #   need(!is.null(selected_var_name()),   'Error 007: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+        #   need(!is.null(selected_var_pos()),    'Error 008: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+        #   need(!is.null(selected_var_letter()), 'Error 009: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+        #   errorClass = "ERROR"
+        # )
+        #
+        #
+        #
+        # validate(
+        #   need(sum(colnames(database()) == selected_var_name()) == 1, 'Error 010: El nombre de variable seleccionado no pertenece a la base.'),
+        #   errorClass = "ERROR"
+        # )
+        #
+        # validate(
+        #   need(ncol(database()) >= selected_var_pos(), 'Error 011: La posición de variable no pertenece a la base de datos.'),
+        #   errorClass = "ERROR"
+        # )
+        #
+        #
+        # vector_vc <- database()[,selected_var_pos()]
+        #
+        # validate(
+        #   need((sum(is.na(vector_vc))==0), 'Error 014: La columna seleccionada posee al menos una celda sin datos. \n
+        #       Usted, ¿está trabajando con una base de datos que corresponde a la Diplomatura?.
+        #       La diplomatura es una iniciación a R por lo que solo veremos código de R aplicable a bases de datos sin celdas vacías.'),
+        #   errorClass = "ERROR"
+        # )
+        #
+        # # validate(
+        # #   need((is.numeric(vector_vr)), 'Error 015:
+        # #   Las medidas resumen solo son aplicables a variables numéricas.
+        # #   La variable seleccionada no es numérica.
+        # #   Verifique las siguientes opciones:\n
+        # #        1) Se equivocó al seleccionar variable con la cual trabajar. Elija la variable cuantitativa correcta.\n
+        # #        2) No abrió el archivo csv como archivo de texto en su computadora para tomar noción sobre
+        # #        si el archivo tiene como primera fila al nombre de columnas, cual es el separador de columna
+        # #        y del separador decimal.\n
+        # #        3) Regrese al menú de carga, y verifique que todos las opciones seleccionadas (header, sep, dec) correspondan con lo que usted observa en su archivo CSV en su computadora.\n
+        # #        4) Si usted está trabajando con una base de datos que no corresponde a la Semana 01 de la Diplomatura, verifique que todas las celdas de la columna elegida solo contienen números.
+        # #        Posiblemente alguna celda de la columna seleccionada posee algún caracter no numérico en alguna celda.\n\n\n\n\n\n\n\n'
+        # #   ),
+        # #   errorClass = "ERROR"
+        # # )
+        #
+        # validate(
+        #   need((length(vector_vc)>=1), 'Error 015: La columna seleccionada no posee datos. \n
+        #       Usted, ¿está trabajando con una base de datos de la Diplomatura?.'),
+        #   errorClass = "ERROR"
+        # )
 
         # Como todo esta OK, se habilita el boton de render.
         shinyjs::enable("render_report_button")
@@ -709,22 +709,22 @@ module_diplo_001_clase04_p01_serverA <- function(id){
         # detallados dentro del archivo .Rmd.
         # Por ejemplo, tomamos la base de datos.
         render_env <- new.env()
-        render_env$"BASE" <- database()
+        #render_env$"BASE" <- database()
         render_env$"the_time" <- original_time
-        render_env$"data_source" <- input$data_source
+        #render_env$"data_source" <- input$data_source
 
 
         # # # Objetos de reemplazo
         # Estos elementos seran suplantados sobre la copia
         # del archivo .Rmd que esta en la carpeta temporal
         replacement_list <- list()
-        replacement_list$"selected_var_pos" <- selected_var_pos()
-        replacement_list$".user_file" <- paste0("\"", input$csv_file_path$name, "\"")
-        replacement_list$".user_header" <- as.logical(as.character(input$csv_header))
-        replacement_list$".user_sep" <- paste0("\"", input$csv_sep, "\"")
-        replacement_list$".user_dec" <- paste0("\"", input$csv_dec, "\"")
-        replacement_list$".diplo_name_database" <- input$diplo_database
-        replacement_list$".r_name_database" <- input$r_database
+        # replacement_list$"selected_var_pos" <- selected_var_pos()
+        # replacement_list$".user_file" <- paste0("\"", input$csv_file_path$name, "\"")
+        # replacement_list$".user_header" <- as.logical(as.character(input$csv_header))
+        # replacement_list$".user_sep" <- paste0("\"", input$csv_sep, "\"")
+        # replacement_list$".user_dec" <- paste0("\"", input$csv_dec, "\"")
+        # replacement_list$".diplo_name_database" <- input$diplo_database
+        # replacement_list$".r_name_database" <- input$r_database
 
         # # # Aplicacion de modificaciones
         # Aplicamos todas las modificaciones sobre el archivo .Rmd
@@ -734,11 +734,13 @@ module_diplo_001_clase04_p01_serverA <- function(id){
         lineas_modificadas <- readLines(output_path_rmd)
 
         # Lo modificamos...
+        if(length(replacement_list)>0){
         for (k in 1:length(replacement_list)){
           selected_name <- names(replacement_list)[k]
           lineas_modificadas <- gsub(pattern = selected_name,
                                      replacement = replacement_list[[selected_name]],
                                      x = lineas_modificadas)
+        }
         }
 
         # Guardamos las modificaciones en la carpeta temporal.
@@ -746,21 +748,22 @@ module_diplo_001_clase04_p01_serverA <- function(id){
 
 
         # # # Render All
-        rmarkdown::render(output_path_rmd, rmarkdown::pdf_document(),  output_file = output_path_pdf, envir = render_env)
         rmarkdown::render(output_path_rmd, rmarkdown::html_document(), output_file = output_path_html, envir = render_env)
-        rmarkdown::render(output_path_rmd, rmarkdown::word_document(), output_file = output_path_word, envir = render_env)
+#        rmarkdown::render(output_path_rmd, rmarkdown::pdf_document(),  output_file = output_path_pdf, envir = render_env)
+#        rmarkdown::render(output_path_rmd, rmarkdown::word_document(), output_file = output_path_word, envir = render_env)
 
         # # # Zip all
-        files_to_zip <- c(output_path_pdf, output_path_html, output_path_word)
+        # files_to_zip <- c(output_path_pdf, output_path_html, output_path_word)
+        files_to_zip <- c(output_path_html)
         utils::zip(output_path_zip, files = files_to_zip)
 
         # Add info to ReactiveVals()...
         the_time(execution_time)
         output_temp_folder(new_temp_folder)
         output_path_rmd(output_path_rmd)
-        output_path_pdf(output_path_pdf)
         output_path_html(output_path_html)
-        output_path_word(output_path_word)
+#        output_path_pdf(output_path_pdf)
+ #       output_path_word(output_path_word)
         output_path_zip(output_path_zip)
 
 
@@ -798,9 +801,14 @@ module_diplo_001_clase04_p01_serverA <- function(id){
 
         # Controlamos que todos los objetos 8.1) no sean NUll.
         req(control_05(), render_button_counter() >= 1,
-            the_time(), output_temp_folder(),
-            output_path_rmd(), output_path_pdf(), output_path_html(),
-            output_path_word(), output_path_zip())
+            the_time(),
+            output_temp_folder(),
+            output_path_rmd(),
+            output_path_html(),
+#            output_path_pdf(),
+#            output_path_word(),
+            output_path_zip()
+            )
 
 
 
@@ -808,19 +816,19 @@ module_diplo_001_clase04_p01_serverA <- function(id){
           need(file.exists(output_path_rmd()),    'Error 020: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
           errorClass = "ERROR"
         )
-        validate(
-          need(file.exists(output_path_pdf()),    'Error 021: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
-          errorClass = "ERROR"
-        )
+        # validate(
+        #   need(file.exists(output_path_pdf()),    'Error 021: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+        #   errorClass = "ERROR"
+        # )
 
         validate(
           need(file.exists(output_path_html()),   'Error 022: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
           errorClass = "ERROR"
         )
-        validate(
-          need(file.exists(output_path_word()),   'Error 023: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
-          errorClass = "ERROR"
-        )
+        # validate(
+        #   need(file.exists(output_path_word()),   'Error 023: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
+        #   errorClass = "ERROR"
+        # )
         validate(
           need(file.exists(output_path_zip()),    'Error 024: Problemas con la variable seleccionada. Vuelva a cargar el archivo.'),
           errorClass = "ERROR"
@@ -828,15 +836,15 @@ module_diplo_001_clase04_p01_serverA <- function(id){
 
 
         # # # Si todo se cumplio, activamos los botones.
-        shinyjs::enable("download_button_pdf")
+        #shinyjs::enable("download_button_pdf")
         shinyjs::enable("download_button_html")
-        shinyjs::enable("download_button_word")
+        #shinyjs::enable("download_button_word")
         shinyjs::enable("download_button_zip")
 
         # # # Y los dejamos en verde...
-        if(download_counter_pdf()  >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_pdf")))
+        #if(download_counter_pdf()  >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_pdf")))
         if(download_counter_html() >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_html")))
-        if(download_counter_word() >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_word")))
+        #if(download_counter_word() >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_word")))
         if(download_counter_zip()  >= 1) runjs(sprintf('$("#%s").css({"background-color": "green", "color": "white", "border": "none", "padding": "10px 20px", "text-align": "center", "text-decoration": "none", "display": "inline-block", "font-size": "16px", "margin": "4px 2px", "cursor": "pointer", "border-radius": "12px"});', ns("download_button_zip")))
 
 
@@ -849,14 +857,14 @@ module_diplo_001_clase04_p01_serverA <- function(id){
 
 
 
-      observeEvent(input$selected_var_name, {
-
-        render_button_counter(0)
-        download_counter_pdf(0)
-        download_counter_html(0)
-        download_counter_word(0)
-        download_counter_zip(0)
-      })
+      # observeEvent(input$selected_var_name, {
+      #
+      #   render_button_counter(0)
+      #   download_counter_pdf(0)
+      #   download_counter_html(0)
+      #   download_counter_word(0)
+      #   download_counter_zip(0)
+      # })
 
       # # # PDF
       output$download_button_pdf <- downloadHandler(
@@ -948,128 +956,6 @@ module_diplo_001_clase04_p01_serverB <- function(id){
 
       # ns para el server!
       ns <- session$ns
-
-      output$box01_database <- renderUI({
-
-        shinydashboard::box(
-          title = "01 - Seleccionar base de datos",
-          status = "primary",
-          id = ns("my_box01"),
-          solidHeader = TRUE,
-          collapsible = TRUE,
-          collapsed = FALSE,
-          closable = FALSE,
-          width = 12,
-          fluidRow(
-            column(2,
-                   shiny::selectInput(
-                     inputId = ns("data_source"),
-                     label = "Fuente de datos",
-                     choices = c("CSV files" = "csv_source",
-                                 "Diplo UNC" = "diplo_source",
-                                 "R examples" = "r_source")
-                   )
-            ),
-            column(7,
-                   div(shinyjs::useShinyjs(), id = ns("input-var-02-A"),
-                       shiny::conditionalPanel(
-                         condition = "input.data_source == 'csv_source'",
-                         ns = ns,
-                         fluidRow(
-                           column(4,
-                                  fileInput(
-                                    inputId = ns("csv_file_path"),
-                                    label = "Elija un archivo CSV",
-                                    accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
-                                    #accept = "*/*"
-                                  )
-                           )
-                         ),
-                         fluidRow(
-                           column(1, radioButtons(
-                             inputId = ns("csv_header"),
-                             label = "header",
-                             choices = c("TRUE" = TRUE, "FALSE" = FALSE),
-                             selected = TRUE
-                           )),
-                           column(3, radioButtons(
-                             inputId = ns("csv_sep"),
-                             label = "Separador de columnas",
-                             choices = c("semicolon (;)" = ";", "comma (,)" = ","),
-                             selected = ";"
-                           )),
-                           column(2, radioButtons(
-                             inputId = ns("csv_dec"),
-                             label = "Decimal",
-                             choices = c("Period (.)" = ".", "Comma (,)" = ","),
-                             selected = "."
-                           )),
-                           column(3, radioButtons(
-                             inputId = ns("csv_quote"),
-                             label = "Comillas",
-                             choices = c("Double quotes (\")" = "\"", "Simple quotes (')" = "'"),
-                             selected = "\""
-                           ))
-                         )#,
-                         #tags$hr()
-                       )
-                   ),
-                   div(shinyjs::useShinyjs(), id = ns("input-var-02-B"),
-                       shiny::conditionalPanel(
-                         condition = "input.data_source == 'diplo_source'",
-                         ns = ns,
-                         fluidRow(
-                           column(5,
-                                  shiny::selectInput(
-                                    inputId = ns("diplo_database"),
-                                    label = "Bases de la Diplomatura",
-                                    choices = c("01 - SEMANA01_BASE01_PESOS"  = "SEMANA01_BASE01_PESOS",
-                                                "02 - SEMANA01_BASE02_ALTURA" = "SEMANA01_BASE02_ALTURA")
-                                  )
-                           )
-                         )
-                       )
-                   ),
-                   shiny::conditionalPanel(
-                     condition = "input.data_source == 'r_source'",
-                     ns = ns,
-                     fluidRow(
-                       column(3,
-                              shiny::selectInput(
-                                inputId = ns("r_database"),
-                                label = "Bases de R",
-                                choices = c("01 - mtcars" = "mtcars", "02 - iris" = "iris")
-                              )
-                       )
-                     )
-                   )
-            ),
-            column(3, actionButton(ns("action_load"),
-                                   label = "LOAD"),
-            )
-          ),
-          shinycssloaders::withSpinner(DT::DTOutput(ns("table_database"))),
-
-        )
-
-      })
-
-
-      output$box02_var_selector <- renderUI({
-
-        shinydashboard::box(
-          title = "02 - Selección de variables",
-          status = "primary",
-          id = ns("my_box02"),
-          solidHeader = TRUE,
-          collapsible = TRUE,
-          collapsed = FALSE,
-          closable = FALSE,
-          width = 12,
-          shiny::uiOutput(ns("var_selector"))
-
-        )
-      })
 
 
       output$box03_control_de_mision <- renderUI({
